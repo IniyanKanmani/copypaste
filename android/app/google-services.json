@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "89175436933",
+    "project_id": "copypaste-85843",
+    "storage_bucket": "copypaste-85843.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89175436933:android:ff48768d376235611403ec",
+        "android_client_info": {
+          "package_name": "com.iniyan.copypaste"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89175436933-aunotudqhgfkqvrascu7fu2hv45kf2sc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBLId0EURhzyhESbzAVsulRPSo7iWkN8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "89175436933-aunotudqhgfkqvrascu7fu2hv45kf2sc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
