@@ -1,19 +1,18 @@
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:copypaste/screens/home_screen.dart';
 import 'package:copypaste/screens/login_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 enum DevicePlatform {
   android,
   ios,
   web,
-  webLinux,
-  webWindows,
-  webMacOS,
   linux,
   windows,
   macOS,
@@ -23,13 +22,13 @@ DevicePlatform? device;
 String? deviceName;
 String? userEmail;
 
-List<DevicePlatform> mobileAndWeb = [
+List<DevicePlatform> mobile = [
   DevicePlatform.android,
   DevicePlatform.ios,
+];
+
+List<DevicePlatform> web = [
   DevicePlatform.web,
-  DevicePlatform.webLinux,
-  DevicePlatform.webWindows,
-  DevicePlatform.webMacOS,
 ];
 
 List<DevicePlatform> desktop = [
@@ -46,47 +45,43 @@ void main() async {
 
 Future<void> onCreate() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  if (Platform.isAndroid) {
+  if (UniversalPlatform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     device = DevicePlatform.android;
     deviceName = androidInfo.model.toString().trim();
-  } else if (Platform.isIOS) {
+  } else if (UniversalPlatform.isIOS) {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     device = DevicePlatform.ios;
     deviceName = iosInfo.utsname.machine.toString().trim();
-  } else if (kIsWeb) {
-    if (kIsWeb) {
-      print("Web");
-    } else if (Platform.isLinux) {
-      print("WebLinux");
-      LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
-      device = DevicePlatform.webLinux;
-      deviceName = linuxInfo.name.toString().trim();
-    } else if (Platform.isWindows) {
-      WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
-      device = DevicePlatform.webWindows;
-      deviceName = windowsInfo.computerName.toString().trim();
-    } else if (Platform.isMacOS) {
-      MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
-      device = DevicePlatform.webMacOS;
-      deviceName = macOsInfo.computerName.toString().trim();
-    }
-  } else if (Platform.isLinux) {
+  } else if (UniversalPlatform.isWeb) {
+    WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
+    device = DevicePlatform.web;
+    deviceName = webBrowserInfo.appCodeName;
+  } else if (UniversalPlatform.isLinux) {
     LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
     device = DevicePlatform.linux;
     deviceName = linuxInfo.name.toString().trim();
-  } else if (Platform.isWindows) {
+  } else if (UniversalPlatform.isWindows) {
     WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
     device = DevicePlatform.windows;
     deviceName = windowsInfo.computerName.toString().trim();
-  } else if (Platform.isMacOS) {
+  } else if (UniversalPlatform.isMacOS) {
     MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
     device = DevicePlatform.macOS;
     deviceName = macOsInfo.computerName.toString().trim();
   }
 
-  if (mobileAndWeb.contains(device)) {
-    // await Firebase.initializeApp();
+  if (mobile.contains(device)) {
+    await Firebase.initializeApp();
+  } else if (web.contains(device)) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyCeIRVm7445etJK1CK5RsvM8YlpEzl1yY0",
+        appId: "1:89175436933:web:0771afeae9ba11ba1403ec",
+        messagingSenderId: "89175436933",
+        projectId: "copypaste-85843",
+      ),
+    );
   }
   // else {
   //   firedart.Firestore.initialize(PROJECTID);
@@ -104,7 +99,7 @@ Future<void> onCreate() async {
 
 class MyApp extends StatelessWidget {
   Widget checkSignIn() {
-    if (mobileAndWeb.contains(device)) {
+    if (mobile.contains(device) || web.contains(device)) {
       return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {

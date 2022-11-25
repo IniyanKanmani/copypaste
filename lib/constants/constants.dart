@@ -2,6 +2,9 @@ import 'package:copypaste/clipboard_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+Color kLoginCursorColorColor = const Color(0xFFC0C0C0);
+Color kLoginTextColorColor = const Color(0xFF999999);
+Color kLoginTextButtonColor = const Color(0xFFDDDDDD);
 Color kAppBarBackgroundColor = const Color(0xFF252525);
 Color kBodyBackgroundColor = const Color(0xFF151515);
 Color kActiveIconColor = const Color(0xFFE270FF);
@@ -14,11 +17,13 @@ Color kCardDeviceTextColor = const Color(0xFF6F1AEF);
 Color kCardDeviceNameTextColor = const Color(0xFFD7BDFF);
 Color kCardCopyIconColor = const Color(0xFFC6ADFE);
 Color kCardGradientColor1 = const Color(0xFFE270FF);
-Color kCardGradientColor2 = const Color(0xEEA020F0);
+Color kCardGradientColor2 = const Color(0xFFA020F0);
 
 double kCardHeight = 100.0;
 double kCardElevation = 20.0;
 double kCardLeftPadding = 7.0;
+double kCardBorderRadius = 13.0;
+double kLoginTextFieldFontSize = 17.0;
 
 TextStyle kCardDateTextStyle = TextStyle(
   fontSize: 12.0,
@@ -73,7 +78,7 @@ ShapeBorder kAppBarShape = const RoundedRectangleBorder(
 
 ShapeBorder kCardShape = RoundedRectangleBorder(
   borderRadius: BorderRadius.circular(
-    10.0,
+    kCardBorderRadius,
   ),
 );
 
@@ -137,84 +142,193 @@ Widget listViewCard({
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: kCardLeftPadding,
-                      ),
-                      child: Text(
-                        "${parseWeekday(time.weekday)}, ${DateFormat("MMM").format(time)} ${NumberFormat("00").format(time.day)}",
-                        style: kCardDateTextStyle,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        right: 10.0,
-                      ),
-                      child: Text(
-                        "${NumberFormat("00").format(time.hour)}:${NumberFormat("00").format(time.minute)}",
-                        style: kCardTimeTextStyle,
-                      ),
-                    ),
-                  ],
+                cardTimeRow(
+                  time: time,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15.0,
-                      ),
-                      child: Text(
-                        text,
-                        textAlign: TextAlign.left,
-                        style: kCardDataTextStyle,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        right: 5.0,
-                      ),
-                      child: IconButton(
-                        onPressed: () {
-                          ClipboardManager.setDataToClipboard(data: data);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                "Copied to Clipboard",
-                              ),
-                              backgroundColor: kBodyBackgroundColor,
-                            ),
-                          );
-                        },
-                        icon: kCardCopyButtonIcon,
-                      ),
-                    ),
-                  ],
+                cardDataRow(
+                  context: context,
+                  text: text,
+                  data: data,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: kCardLeftPadding,
-                      ),
-                      child: Row(
-                        children: [
-                          kCardDeviceText,
-                          Text(
-                            deviceName,
-                            style: kCardDeviceNameTextStyle,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                cardDeviceRow(
+                  deviceName: deviceName,
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget cardTimeRow({
+  required DateTime time,
+}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Padding(
+        padding: EdgeInsets.only(
+          left: kCardLeftPadding,
+        ),
+        child: Text(
+          "${parseWeekday(time.weekday)}, ${DateFormat("MMM").format(time)} ${NumberFormat("00").format(time.day)}",
+          style: kCardDateTextStyle,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(
+          right: 10.0,
+        ),
+        child: Text(
+          "${NumberFormat("00").format(time.hour)}:${NumberFormat("00").format(time.minute)}",
+          style: kCardTimeTextStyle,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget cardDataRow(
+    {required BuildContext context,
+    required String text,
+    required String data}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(
+          left: 15.0,
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.left,
+          style: kCardDataTextStyle,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(
+          right: 5.0,
+        ),
+        child: IconButton(
+          onPressed: () {
+            ClipboardManager.setDataToClipboard(data: data);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  "Copied to Clipboard",
+                ),
+                backgroundColor: kBodyBackgroundColor,
+              ),
+            );
+          },
+          icon: kCardCopyButtonIcon,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget cardDeviceRow({
+  required String deviceName,
+}) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Padding(
+        padding: EdgeInsets.only(
+          left: kCardLeftPadding,
+        ),
+        child: Row(
+          children: [
+            kCardDeviceText,
+            Text(
+              deviceName,
+              style: kCardDeviceNameTextStyle,
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget loginTextField({
+  required TextEditingController controller,
+  required TextInputAction action,
+  required TextInputType inputType,
+  required String hintText,
+  required bool obscureText,
+}) {
+  return TextField(
+    controller: controller,
+    textInputAction: action,
+    keyboardType: inputType,
+    style: TextStyle(
+      fontSize: kLoginTextFieldFontSize,
+      color: kLoginTextColorColor,
+    ),
+    obscureText: obscureText,
+    cursorColor: kLoginCursorColorColor,
+    decoration: InputDecoration(
+      filled: true,
+      fillColor: kAppBarBackgroundColor,
+      hintText: hintText,
+      hintStyle: TextStyle(
+        fontSize: kLoginTextFieldFontSize,
+        color: kLoginTextColorColor,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: kLoginTextColorColor,
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(
+            kCardBorderRadius,
+          ),
+        ),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(
+            kCardBorderRadius,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget loginElevatedButton({
+  required VoidCallback onTap,
+  required String text,
+}) {
+  return Container(
+    width: 140,
+    height: 42,
+    decoration: kCardDecoration.copyWith(
+      borderRadius: BorderRadius.circular(
+        kCardBorderRadius,
+      ),
+    ),
+    child: ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            kCardBorderRadius,
+          ),
+        ),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 20.0,
+            color: kLoginTextButtonColor,
           ),
         ),
       ),

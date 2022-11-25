@@ -1,3 +1,4 @@
+import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firedart/firedart.dart' as firedart;
@@ -9,7 +10,7 @@ class LoginScreen extends StatelessWidget {
   final passwordController = TextEditingController();
 
   Future signIn() async {
-    if (mobileAndWeb.contains(device)) {
+    if (mobile.contains(device) || web.contains(device)) {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -29,7 +30,7 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future signUp() async {
-    if (mobileAndWeb.contains(device)) {
+    if (mobile.contains(device) || web.contains(device)) {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -62,6 +63,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: kBodyBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -73,71 +75,54 @@ class LoginScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
-                  vertical: 10.0,
+                  vertical: 15.0,
                 ),
-                child: TextField(
+                child: loginTextField(
                   controller: emailController,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    hintText: "Email",
-                    hintStyle: TextStyle(fontSize: 17),
-                    border: OutlineInputBorder(),
-                  ),
+                  action: TextInputAction.next,
+                  inputType: TextInputType.emailAddress,
+                  hintText: "Email",
+                  obscureText: false,
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10.0,
-                  vertical: 10.0,
+                  vertical: 15.0,
                 ),
-                child: TextField(
+                child: loginTextField(
                   controller: passwordController,
-                  textInputAction: TextInputAction.done,
-                  keyboardType: TextInputType.text,
+                  action: TextInputAction.done,
+                  inputType: TextInputType.text,
+                  hintText: "Password",
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: "Password",
-                    hintStyle: TextStyle(fontSize: 17),
-                    border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(
+                height: 25.0,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      loginElevatedButton(
+                        onTap: signIn,
+                        text: "Login",
+                      ),
+                      loginElevatedButton(
+                        onTap: signUp,
+                        text: "Sign Up",
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 0.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: signIn,
-                      child: const Center(
-                        child: Text(
-                          "    Login    ",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20.0,
-                    ),
-                    ElevatedButton(
-                      onPressed: signUp,
-                      child: const Center(
-                        child: Text(
-                          "   Sign Up   ",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(
+                height: 75.0,
               ),
             ],
           ),

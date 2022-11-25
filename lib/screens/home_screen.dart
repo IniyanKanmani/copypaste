@@ -33,10 +33,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        AndroidChannel.resumeBackgroundServiceMethod();
+        if (device == DevicePlatform.android) {
+          AndroidChannel.resumeBackgroundServiceMethod();
+        }
         break;
       case AppLifecycleState.resumed:
-        AndroidChannel.pauseBackgroundServiceMethod();
+        if (device == DevicePlatform.android) {
+          AndroidChannel.pauseBackgroundServiceMethod();
+        }
         break;
       case AppLifecycleState.inactive:
         break;

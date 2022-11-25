@@ -25,7 +25,7 @@ class ClipboardManager {
         time: DateTime.now(),
       );
 
-      if (mobileAndWeb.contains(device)) {
+      if (mobile.contains(device)) {
         CollectionReference reference = FirebaseFirestore.instance
             .collection('users')
             .doc(userEmail!)
@@ -47,7 +47,7 @@ class ClipboardManager {
   static Future getDataFromCloud({
     required DevicePlatform device,
   }) async {
-    if (mobileAndWeb.contains(device)) {
+    if (mobile.contains(device)) {
       CollectionReference copiedCollection = FirebaseFirestore.instance
           .collection('users')
           .doc(userEmail!)
