@@ -2,8 +2,12 @@ import 'dart:async';
 
 // import 'package:clipboard/clipboard.dart';
 // import 'package:clipboard_watcher/clipboard_watcher.dart';
+import 'package:clipboard_watcher/clipboard_watcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:copypaste/copied_data.dart';
+import 'package:copypaste/desktop_clipboard_listener.dart';
+import 'package:copypaste/services/desktop_cloud_changes.dart';
+
 // import 'package:firedart/firedart.dart' as firedart;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +16,7 @@ import 'main.dart';
 
 class ClipboardManager {
   static String lastDataFromCloud = "";
+  static String lastDataFromDevice = "";
 
   static Future sendDataToCloud({
     required String newData,
@@ -32,6 +37,11 @@ class ClipboardManager {
             .collection("text");
 
         await reference.add(copiedData.toJson());
+      } else if (desktop.contains(device)) {
+        DesktopCloudChanges.sendDocumentToCloud(
+          newData: newData,
+          deviceName: deviceName,
+        );
       }
       // else {
       //   firedart.CollectionReference reference = firedart.Firestore.instance
@@ -141,6 +151,10 @@ class ClipboardManager {
 
   static void listenToClipboardChanges(
       {required DevicePlatform device, required String deviceName}) async {
+    if (!clipboardWatcher.hasListeners) {
+      clipboardWatcher.addListener(DesktopClipboardListener());
+      clipboardWatcher.start();
+    }
     // String recentCopiedData = await getCurrentClipboardData();
     // Timer.periodic(
     //   const Duration(seconds: 5),

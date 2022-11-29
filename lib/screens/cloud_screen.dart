@@ -1,7 +1,10 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:copypaste/clipboard_manager.dart';
 import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CloudScreen extends StatefulWidget {
   @override
@@ -52,6 +55,14 @@ class _CloudScreenState extends State<CloudScreen> {
 
               docs?.sort((b, a) => a["time"].compareTo(b["time"]));
               int eventCount = docs!.length;
+
+              ///
+
+              // FlutterClipboard.copy(docs[0]["data"]);
+              // Clipboard.setData(ClipboardData(text: eventCount.toString()));
+              ClipboardManager.setDataToClipboard(data: eventCount.toString());
+
+              ///
 
               if (eventCount == 0) {
                 return Container();

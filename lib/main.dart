@@ -5,9 +5,16 @@ import 'package:copypaste/screens/login_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dart/firebase_dart.dart' as FirebaseDart;
+import 'package:firebase_dart/auth.dart' as FirebaseDartAuth;
+// import 'package:path_provider/path_provider.dart';
+
 // import 'package:flutter/foundation.dart';
+// import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
+// import 'package:desktop_webview_window/desktop_webview_window.dart';
+// import 'package:webview_dart/webview_dart.dart';
 
 enum DevicePlatform {
   android,
@@ -18,9 +25,15 @@ enum DevicePlatform {
   macOS,
 }
 
+String apiKey = "AIzaSyCeIRVm7445etJK1CK5RsvM8YlpEzl1yY0";
+String appId = "1:89175436933:web:0771afeae9ba11ba1403ec";
+String messagingSenderId = "89175436933";
+String projectId = "copypaste-85843";
+
 DevicePlatform? device;
 String? deviceName;
 String? userEmail;
+String? userToken;
 
 List<DevicePlatform> mobile = [
   DevicePlatform.android,
@@ -36,6 +49,10 @@ List<DevicePlatform> desktop = [
   DevicePlatform.windows,
   DevicePlatform.macOS,
 ];
+
+FirebaseDart.FirebaseApp? desktopApp;
+
+// Webview? webView;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,13 +92,41 @@ Future<void> onCreate() async {
     await Firebase.initializeApp();
   } else if (web.contains(device)) {
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyCeIRVm7445etJK1CK5RsvM8YlpEzl1yY0",
-        appId: "1:89175436933:web:0771afeae9ba11ba1403ec",
-        messagingSenderId: "89175436933",
-        projectId: "copypaste-85843",
+      options: FirebaseOptions(
+        apiKey: apiKey,
+        appId: appId,
+        messagingSenderId: messagingSenderId,
+        projectId: projectId,
       ),
     );
+  } else if (desktop.contains(device)) {
+    FirebaseDart.FirebaseDart.setup();
+
+    desktopApp = await FirebaseDart.Firebase.initializeApp(
+      name: "CopyPasteDesktop",
+      options: FirebaseDart.FirebaseOptions(
+          apiKey: apiKey,
+          appId: appId,
+          messagingSenderId: messagingSenderId,
+          projectId: projectId),
+    );
+
+    // webView = await WebviewWindow.create(
+    //   configuration: CreateConfiguration(
+    //     windowHeight: 1280,
+    //     windowWidth: 720,
+    //     title: "CopyPaste",
+    //     titleBarHeight: 50,
+    //     titleBarTopPadding: 500,
+    //     userDataFolderWindows: await _getWebViewPath(),
+    //   ),
+    // );
+
+    // webView.launch('https://www.google.com/');
+    // webView?.launch('https://iniyankanmani.github.io/copypaste_web/#/');
+    // webView?.launch('https://flutter.github.io/samples/web/github_dataviz/');
+
+    // Webview(false).navigate('https://iniyankanmani.github.io/copypaste_web/#/').run();
   }
   // else {
   //   firedart.Firestore.initialize(PROJECTID);
@@ -105,6 +150,11 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             userEmail = FirebaseAuth.instance.currentUser?.email;
+            FirebaseAuth.instance.currentUser?.getIdToken().then((value) {
+              userToken = value;
+              print('Firebase token: $userToken');
+              return value;
+            });
             return HomeScreen();
           } else {
             return LoginScreen();
@@ -112,7 +162,32 @@ class MyApp extends StatelessWidget {
         },
       );
     } else {
-      return Container();
+      return StreamBuilder<FirebaseDartAuth.User?>(
+        stream: FirebaseDartAuth.FirebaseAuth.instanceFor(app: desktopApp!).authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            userEmail = FirebaseDartAuth.FirebaseAuth.instanceFor(app: desktopApp!).currentUser?.email;
+            FirebaseDartAuth.FirebaseAuth.instanceFor(app: desktopApp!).currentUser?.getIdToken(false).then((value) {
+              userToken = value;
+              print('Firebase Desktop token: $userToken');
+              return value;
+            });
+            return HomeScreen();
+          } else {
+            return LoginScreen();
+          }
+        }
+      );
+      // return Container(
+      //   color: Colors.blue,
+      //   child: ElevatedButton(
+      //     onPressed: () {
+      //       webView?.reload();
+      //     },
+      //     child: Container(),
+      //   ),
+      // );
+
       // return StreamBuilder<bool>(
       //   stream: firedart.FirebaseAuth.instance.signInState,
       //   builder: (context, snapshot) {
@@ -140,3 +215,11 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// Future<String> _getWebViewPath() async {
+//   final document = await getApplicationDocumentsDirectory();
+//   return p.join(
+//     document.path,
+//     'desktop_webview_window',
+//   );
+// }

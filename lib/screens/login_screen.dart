@@ -1,6 +1,11 @@
+// import 'dart:js' as js;
 import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
+import 'package:firebase_dart/auth.dart' as FirebaseDartAuth;
+// import 'package:desktop_webview_window/desktop_webview_window.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:path/path.dart' as p;
+// import 'package:path_provider/path_provider.dart';
 // import 'package:firedart/firedart.dart' as firedart;
 import 'package:flutter/material.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +21,41 @@ class LoginScreen extends StatelessWidget {
         password: passwordController.text.trim(),
       );
       return;
+    } else if (desktop.contains(device)) {
+      await FirebaseDartAuth.FirebaseAuth.instanceFor(app: desktopApp!).signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      return;
     }
+    // else if (web.contains(device)) {
+    //   // js.context.callMethod('getURLArgs', ['CopyPaste']);
+    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //     email: emailController.text.trim(),
+    //     password: passwordController.text.trim(),
+    //   );
+    //   return;
+    // }
+    // else {
+    //   String url = 'https://iniyankanmani.github.io/copypaste_web/#/?email=${emailController.text.trim()}&password=${passwordController.text.trim()}';
+    //   // String url = 'http://localhost:46507/#/?email=${emailController.text.trim()}&password=${passwordController.text.trim()}';
+    //   print('Linux : $url');
+    //
+    //   final webviewLinux = await WebviewWindow.create(
+    //     configuration: CreateConfiguration(
+    //       windowHeight: 1280,
+    //       windowWidth: 720,
+    //       title: "CopyPaste",
+    //       titleBarHeight: 0,
+    //       titleBarTopPadding: 0,
+    //       userDataFolderWindows: await _getWebViewPath(),
+    //     )
+    //   );
+    //
+    //   webviewLinux.launch(url);
+    //
+    // }
+
     // else {
     //   await firedart.FirebaseAuth.instance.signIn(
     //     emailController.text.trim(),
@@ -131,3 +170,11 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+
+// Future<String> _getWebViewPath() async {
+//   final document = await getApplicationDocumentsDirectory();
+//   return p.join(
+//     document.path,
+//     'desktop_webview_window',
+//   );
+// }
