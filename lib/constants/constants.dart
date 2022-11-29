@@ -1,6 +1,6 @@
-import 'package:copypaste/clipboard_manager.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
+import 'package:copypaste/services/clipboard_manager.dart';
 
 Color kLoginCursorColorColor = const Color(0xFFC0C0C0);
 Color kLoginTextColorColor = const Color(0xFF999999);

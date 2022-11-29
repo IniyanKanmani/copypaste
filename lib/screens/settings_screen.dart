@@ -1,5 +1,5 @@
-import 'package:copypaste/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:copypaste/constants/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override

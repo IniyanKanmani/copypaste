@@ -1,13 +1,12 @@
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:copypaste/channels/android_channel.dart';
-import 'package:copypaste/clipboard_manager.dart';
-import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
+import 'package:flutter/material.dart';
+import 'package:copypaste/services/clipboard_manager.dart';
+import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/screens/cloud_screen.dart';
 import 'package:copypaste/screens/device_screen.dart';
 import 'package:copypaste/screens/settings_screen.dart';
-import 'package:copypaste/services/desktop_cloud_changes.dart';
-import 'package:flutter/material.dart';
+import 'package:copypaste/channels/android_channel.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -62,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (device == DevicePlatform.android) {
       AndroidChannel.requestBackgroundServiceMethod();
     } else if (desktop.contains(device)) {
-      await DesktopCloudChanges.getCloudDocuments();
-      DesktopCloudChanges.listenToCloudDocuments();
       ClipboardManager.listenToClipboardChanges(
         device: device!,
         deviceName: deviceName!,

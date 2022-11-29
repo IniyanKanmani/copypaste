@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
 import 'package:flutter/material.dart';
+import 'package:copypaste/constants/constants.dart';
+import 'package:firebase_for_all/firebase_for_all.dart';
 
 class DeviceScreen extends StatefulWidget {
   @override
@@ -29,12 +29,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ),
       ),
       backgroundColor: kBodyBackgroundColor,
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
+      body: CollectionBuilder(
+        stream: FirestoreForAll.instance
             .collection("users")
-            .doc(userEmail)
+            .doc(userEmail!)
             .collection("text")
-            .where("device", isEqualTo: deviceName)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
@@ -47,11 +46,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 child: CircularProgressIndicator(),
               );
             default:
-              List<QueryDocumentSnapshot<Map<String, dynamic>>>? docs =
-                  snapshot.data?.docs;
+              List<DocumentSnapshotForAll<Map<String, dynamic>>>? docs =
+                  snapshot.data?.docs
+                      as List<DocumentSnapshotForAll<Map<String, dynamic>>>;
 
-              docs?.sort((b, a) => a["time"].compareTo(b["time"]));
-              int eventCount = docs!.length;
+              docs.sort((b, a) => a["time"].compareTo(b["time"]));
+              docs.removeWhere(
+                (element) {
+                  if (element["device"] == deviceName) {
+                    return false;
+                  }
+                  return true;
+                },
+              );
+              int eventCount = docs.length;
 
               if (eventCount == 0) {
                 return Container();
@@ -64,7 +72,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: eventCount,
                   itemBuilder: (context, index) {
-                    DocumentSnapshot doc = docs[index];
+                    DocumentSnapshotForAll doc = docs[index];
 
                     List<String> data = doc["data"].split("");
                     int dataLength = data.length;
@@ -79,8 +87,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     }
 
                     DateTime time =
-                        DateTime.parse(doc["time"].toDate().toString())
-                            .toLocal();
+                        DateTime.parse(doc["time"].toString()).toLocal();
 
                     String deviceName = doc["device"];
 

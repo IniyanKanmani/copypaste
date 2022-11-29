@@ -1,6 +1,6 @@
-import 'package:clipboard_watcher/clipboard_watcher.dart';
-import 'package:copypaste/clipboard_manager.dart';
 import 'package:copypaste/main.dart';
+import 'package:clipboard_watcher/clipboard_watcher.dart';
+import 'package:copypaste/services/clipboard_manager.dart';
 
 class DesktopClipboardListener extends ClipboardListener {
   @override

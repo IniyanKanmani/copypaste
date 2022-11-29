@@ -1,10 +1,8 @@
-import 'package:clipboard/clipboard.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:copypaste/clipboard_manager.dart';
-import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:copypaste/services/clipboard_manager.dart';
+import 'package:copypaste/constants/constants.dart';
+import 'package:firebase_for_all/firebase_for_all.dart';
 
 class CloudScreen extends StatefulWidget {
   @override
@@ -32,14 +30,14 @@ class _CloudScreenState extends State<CloudScreen> {
         ),
       ),
       backgroundColor: kBodyBackgroundColor,
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
+      body: CollectionBuilder(
+        stream: FirestoreForAll.instance
             .collection("users")
-            .doc(userEmail)
+            .doc(userEmail!)
             .collection("text")
-            .where("device", isNotEqualTo: deviceName)
             .snapshots(),
-        builder: (context, snapshot) {
+        builder: (BuildContext context,
+            AsyncSnapshot<QuerySnapshotForAll> snapshot) {
           if (snapshot.hasError) {
             return Container();
           }
@@ -50,19 +48,21 @@ class _CloudScreenState extends State<CloudScreen> {
                 child: CircularProgressIndicator(),
               );
             default:
-              List<QueryDocumentSnapshot<Map<String, dynamic>>>? docs =
-                  snapshot.data?.docs;
+              List<DocumentSnapshotForAll<Map<String, dynamic>>>? docs =
+                  snapshot.data?.docs
+                      as List<DocumentSnapshotForAll<Map<String, dynamic>>>;
 
-              docs?.sort((b, a) => a["time"].compareTo(b["time"]));
-              int eventCount = docs!.length;
-
-              ///
-
-              // FlutterClipboard.copy(docs[0]["data"]);
-              // Clipboard.setData(ClipboardData(text: eventCount.toString()));
-              ClipboardManager.setDataToClipboard(data: eventCount.toString());
-
-              ///
+              docs.sort((b, a) => a["time"].compareTo(b["time"]));
+              docs.removeWhere(
+                (element) {
+                  if (element["device"] == deviceName) {
+                    return true;
+                  }
+                  return false;
+                },
+              );
+              int eventCount = docs.length;
+              ClipboardManager.setDataToClipboard(data: docs[0]["data"]);
 
               if (eventCount == 0) {
                 return Container();
@@ -76,7 +76,7 @@ class _CloudScreenState extends State<CloudScreen> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: eventCount,
                   itemBuilder: (context, index) {
-                    DocumentSnapshot doc = docs[index];
+                    DocumentSnapshotForAll doc = docs[index];
 
                     List<String> data = doc["data"].split("");
                     int dataLength = data.length;
@@ -91,8 +91,7 @@ class _CloudScreenState extends State<CloudScreen> {
                     }
 
                     DateTime time =
-                        DateTime.parse(doc["time"].toDate().toString())
-                            .toLocal();
+                        DateTime.parse(doc["time"].toString()).toLocal();
 
                     String deviceName = doc["device"];
 

@@ -1,103 +1,24 @@
-// import 'dart:js' as js;
-import 'package:copypaste/constants/constants.dart';
-import 'package:copypaste/main.dart';
-import 'package:firebase_dart/auth.dart' as FirebaseDartAuth;
-// import 'package:desktop_webview_window/desktop_webview_window.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:path/path.dart' as p;
-// import 'package:path_provider/path_provider.dart';
-// import 'package:firedart/firedart.dart' as firedart;
 import 'package:flutter/material.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:copypaste/constants/constants.dart';
+import 'package:firebase_for_all/firebase_for_all.dart';
 
 class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   Future signIn() async {
-    if (mobile.contains(device) || web.contains(device)) {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-      return;
-    } else if (desktop.contains(device)) {
-      await FirebaseDartAuth.FirebaseAuth.instanceFor(app: desktopApp!).signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-      return;
-    }
-    // else if (web.contains(device)) {
-    //   // js.context.callMethod('getURLArgs', ['CopyPaste']);
-    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
-    //     email: emailController.text.trim(),
-    //     password: passwordController.text.trim(),
-    //   );
-    //   return;
-    // }
-    // else {
-    //   String url = 'https://iniyankanmani.github.io/copypaste_web/#/?email=${emailController.text.trim()}&password=${passwordController.text.trim()}';
-    //   // String url = 'http://localhost:46507/#/?email=${emailController.text.trim()}&password=${passwordController.text.trim()}';
-    //   print('Linux : $url');
-    //
-    //   final webviewLinux = await WebviewWindow.create(
-    //     configuration: CreateConfiguration(
-    //       windowHeight: 1280,
-    //       windowWidth: 720,
-    //       title: "CopyPaste",
-    //       titleBarHeight: 0,
-    //       titleBarTopPadding: 0,
-    //       userDataFolderWindows: await _getWebViewPath(),
-    //     )
-    //   );
-    //
-    //   webviewLinux.launch(url);
-    //
-    // }
-
-    // else {
-    //   await firedart.FirebaseAuth.instance.signIn(
-    //     emailController.text.trim(),
-    //     passwordController.text.trim(),
-    //   );
-    //   saveToSharedPreferences(
-    //     email: emailController.text.trim(),
-    //     password: passwordController.text.trim(),
-    //   );
-    // }
+    await FirebaseAuthForAll.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
   }
 
   Future signUp() async {
-    if (mobile.contains(device) || web.contains(device)) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-      // await ClipboardManager.sendDataToCloud(
-      //     newData: "Hello", device: device!, deviceName: deviceName!);
-      return;
-    }
-    // else {
-    //   await firedart.FirebaseAuth.instance.signUp(
-    //     emailController.text.trim(),
-    //     passwordController.text.trim(),
-    //   );
-    //   saveToSharedPreferences(
-    //     email: emailController.text.trim(),
-    //     password: passwordController.text.trim(),
-    //   );
-    // }
+    await FirebaseAuthForAll.instance.createUserWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
   }
-
-  // void saveToSharedPreferences(
-  //     {required String email, required String password}) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //
-  //   await prefs.setString("email", email);
-  //   await prefs.setString("password", password);
-  //   await prefs.setBool("loggedIn", true);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +67,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 child: Center(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       loginElevatedButton(
                         onTap: signIn,
@@ -170,11 +91,3 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
-
-// Future<String> _getWebViewPath() async {
-//   final document = await getApplicationDocumentsDirectory();
-//   return p.join(
-//     document.path,
-//     'desktop_webview_window',
-//   );
-// }
