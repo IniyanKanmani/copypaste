@@ -63,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       ClipboardManager.lastDataFromDevice =
       await ClipboardManager.getCurrentClipboardData();
+      print("Last Device Data: ${ClipboardManager.lastDataFromDevice}");
       ClipboardManager.lastDataFromCloud =
       await ClipboardManager.getLastCloudData();
-      print("Last Device Data: ${ClipboardManager.lastDataFromDevice}");
       print("Last Cloud Data: ${ClipboardManager.lastDataFromCloud}");
     } catch (e) {}
 

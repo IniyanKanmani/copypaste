@@ -5,18 +5,15 @@ import 'package:copypaste/services/clipboard_manager.dart';
 class DesktopClipboardListener extends ClipboardListener {
   @override
   void onClipboardChanged() async {
-    ClipboardManager.getCurrentClipboardData().then((value) async {
-      print("He is in here with value: $value");
-      if (value != ClipboardManager.lastDataFromDevice && value != ClipboardManager.lastDataFromCloud) {
+    String currentClipboardData = await ClipboardManager.getCurrentClipboardData();
+      if (currentClipboardData != ClipboardManager.lastDataFromDevice && currentClipboardData != ClipboardManager.lastDataFromCloud) {
         ClipboardManager.sendDataToCloud(
-          newData: value,
+          newData: currentClipboardData,
           device: device!,
           deviceName: deviceName!,
         );
-        ClipboardManager.lastDataFromDevice = value;
+        ClipboardManager.lastDataFromDevice = currentClipboardData;
       }
-      return value;
-    });
   }
 
   void addDesktopClipboardChangesListener() {

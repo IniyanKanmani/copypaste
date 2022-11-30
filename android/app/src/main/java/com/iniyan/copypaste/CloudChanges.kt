@@ -14,7 +14,7 @@ class CloudChanges {
     companion object {
         private lateinit var collectionReference: CollectionReference
         private lateinit var snapShopListener: ListenerRegistration
-
+        var latestCloudData: String = ""
 
         fun destroy() {
             snapShopListener.remove()
@@ -63,6 +63,7 @@ class CloudChanges {
 
 
                                 val data: String = docMap["data"] as String
+                                latestCloudData = data
 
 //                                val overlayWindow = OverlayWindow()
 //

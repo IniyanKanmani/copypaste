@@ -15,6 +15,7 @@ class ReadLogs {
         private var inputStreamReader: InputStreamReader? = null
         private lateinit var bufferedReader: BufferedReader
         private var exit: Boolean = false
+        var lastCopiedData: String = BackgroundService.clipboardManager.primaryClip?.getItemAt(0)?.text.toString()
 
         fun destroy() {
             try {
@@ -78,10 +79,11 @@ class ReadLogs {
                 BackgroundService.clipboardManager.primaryClip?.getItemAt(0)?.text.toString()
             overlay.destroyOverlayWindow()
 
-            val time: Timestamp = Timestamp.now()
-
-            val cloudChanges = CloudChanges()
-            cloudChanges.sendData(data, time)
+            if (lastCopiedData != data && CloudChanges.latestCloudData != data && data != "null") {
+                val time: Timestamp = Timestamp.now()
+                val cloudChanges = CloudChanges()
+                cloudChanges.sendData(data, time)
+            }
 
         }
     }

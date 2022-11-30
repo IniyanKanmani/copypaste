@@ -10,6 +10,7 @@ class CloudScreen extends StatefulWidget {
 }
 
 class _CloudScreenState extends State<CloudScreen> {
+  static int count = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +72,7 @@ class _CloudScreenState extends State<CloudScreen> {
 
               if (ClipboardManager.lastDataFromCloud != docs[0]["data"] &&
                   ClipboardManager.lastDataFromDevice != docs[0]["data"]) {
-                if (desktop.contains(device)) {
+                if (desktop.contains(device) && count != 0) {
                   ClipboardManager.setDataToClipboard(data: docs[0]["data"]);
                   ClipboardManager.lastDataFromDevice = docs[0]["data"];
                 }
@@ -79,6 +80,8 @@ class _CloudScreenState extends State<CloudScreen> {
                 print("After Cloud Update Device Data: ${ClipboardManager.lastDataFromDevice}");
                 print("After Cloud Update Cloud Data: ${ClipboardManager.lastDataFromCloud}");
               }
+
+              count++;
 
               return Padding(
                 padding: const EdgeInsets.only(
