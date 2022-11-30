@@ -64,6 +64,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
               if (eventCount == 0) {
                 return Container();
               }
+
               return Padding(
                 padding: const EdgeInsets.only(
                   top: 7.0,
@@ -86,8 +87,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       text = doc["data"];
                     }
 
-                    DateTime time =
-                        DateTime.parse(doc["time"].toString()).toLocal();
+                    DateTime time;
+                    try {
+                      time = DateTime.parse(doc["time"].toDate().toString())
+                          .toLocal();
+                    } catch (e) {
+                      time = DateTime.parse(doc["time"].toString()).toLocal();
+                    }
 
                     String deviceName = doc["device"];
 

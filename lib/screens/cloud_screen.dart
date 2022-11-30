@@ -53,6 +53,7 @@ class _CloudScreenState extends State<CloudScreen> {
                       as List<DocumentSnapshotForAll<Map<String, dynamic>>>;
 
               docs.sort((b, a) => a["time"].compareTo(b["time"]));
+
               docs.removeWhere(
                 (element) {
                   if (element["device"] == deviceName) {
@@ -61,11 +62,22 @@ class _CloudScreenState extends State<CloudScreen> {
                   return false;
                 },
               );
+
               int eventCount = docs.length;
-              ClipboardManager.setDataToClipboard(data: docs[0]["data"]);
 
               if (eventCount == 0) {
                 return Container();
+              }
+
+              if (ClipboardManager.lastDataFromCloud != docs[0]["data"] &&
+                  ClipboardManager.lastDataFromDevice != docs[0]["data"]) {
+                if (desktop.contains(device)) {
+                  ClipboardManager.setDataToClipboard(data: docs[0]["data"]);
+                  ClipboardManager.lastDataFromDevice = docs[0]["data"];
+                }
+                ClipboardManager.lastDataFromCloud = docs[0]["data"];
+                print("After Cloud Update Device Data: ${ClipboardManager.lastDataFromDevice}");
+                print("After Cloud Update Cloud Data: ${ClipboardManager.lastDataFromCloud}");
               }
 
               return Padding(
@@ -90,8 +102,13 @@ class _CloudScreenState extends State<CloudScreen> {
                       text = doc["data"];
                     }
 
-                    DateTime time =
-                        DateTime.parse(doc["time"].toString()).toLocal();
+                    DateTime time;
+                    try {
+                      time = DateTime.parse(doc["time"].toDate().toString())
+                          .toLocal();
+                    } catch (e) {
+                      time = DateTime.parse(doc["time"].toString()).toLocal();
+                    }
 
                     String deviceName = doc["device"];
 

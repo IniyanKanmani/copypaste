@@ -74,17 +74,31 @@ Future<void> onCreate() async {
     deviceName = macOsInfo.computerName.toString().trim();
   }
 
-  await FirebaseCoreForAll.initializeApp(
-    options: FirebaseOptions(
-      apiKey: apiKey,
-      appId: appId,
-      messagingSenderId: messagingSenderId,
-      projectId: projectId,
-    ),
-    firestore: true,
-    auth: true,
-    storage: false,
+  FirebaseOptions options = FirebaseOptions(
+    apiKey: apiKey,
+    appId: appId,
+    messagingSenderId: messagingSenderId,
+    projectId: projectId,
   );
+
+  try {
+    await FirebaseCoreForAll.initializeApp(
+      options: options,
+      firestore: true,
+      auth: true,
+      storage: false,
+    );
+  } catch (e) {
+    print(e);
+    print("Default was already Created");
+    await FirebaseCoreForAll.initializeApp(
+      name: "Copy Paste",
+      options: options,
+      firestore: true,
+      auth: true,
+      storage: false,
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -95,7 +109,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.hasData) {
           userEmail = FirebaseAuthForAll.instance.currentUser!.email;
           FirebaseAuthForAll.instance.currentUser?.getIdToken().then(
-            (value) {
+                (value) {
               userToken = value;
               return value;
             },

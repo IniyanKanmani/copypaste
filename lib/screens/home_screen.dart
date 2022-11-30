@@ -1,6 +1,7 @@
 import 'package:copypaste/main.dart';
-import 'package:flutter/material.dart';
 import 'package:copypaste/services/clipboard_manager.dart';
+import 'package:copypaste/services/desktop_clipboard_listener.dart';
+import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
 import 'package:copypaste/screens/cloud_screen.dart';
 import 'package:copypaste/screens/device_screen.dart';
@@ -14,8 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  TextEditingController copyTextController = TextEditingController();
   int currentIndex = 0;
+  DesktopClipboardListener desktopClipboardListener = DesktopClipboardListener();
 
   List<Widget> screens = [
     CloudScreen(),
@@ -26,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     onCreate();
   }
 
@@ -53,19 +53,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    onDestroy();
     super.dispose();
   }
 
   void onCreate() async {
+    WidgetsBinding.instance.addObserver(this);
+
+    try {
+      ClipboardManager.lastDataFromDevice =
+      await ClipboardManager.getCurrentClipboardData();
+      ClipboardManager.lastDataFromCloud =
+      await ClipboardManager.getLastCloudData();
+      print("Last Device Data: ${ClipboardManager.lastDataFromDevice}");
+      print("Last Cloud Data: ${ClipboardManager.lastDataFromCloud}");
+    } catch (e) {}
+
     if (device == DevicePlatform.android) {
       AndroidChannel.requestBackgroundServiceMethod();
     } else if (desktop.contains(device)) {
-      ClipboardManager.listenToClipboardChanges(
-        device: device!,
-        deviceName: deviceName!,
-      );
+      desktopClipboardListener.addDesktopClipboardChangesListener();
     }
+  }
+
+  void onDestroy() {
+    WidgetsBinding.instance.removeObserver(this);
+    // if (desktop.contains(device)) {
+    //   desktopClipboardListener.removeDesktopClipboardChangesListener();
+    // }
   }
 
   @override

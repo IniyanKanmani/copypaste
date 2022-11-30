@@ -3,8 +3,6 @@ import 'package:copypaste/main.dart';
 import 'package:flutter/services.dart';
 import 'package:copypaste/constants/copied_data.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
-import 'package:clipboard_watcher/clipboard_watcher.dart';
-import 'package:copypaste/services/desktop_clipboard_listener.dart';
 
 class ClipboardManager {
   static String lastDataFromCloud = "";
@@ -31,6 +29,21 @@ class ClipboardManager {
     }
   }
 
+  static Future<String> getLastCloudData() async {
+    QuerySnapshotForAll<Map<String, Object?>> snapshot = await FirestoreForAll
+        .instance
+        .collection("users")
+        .doc(userEmail!)
+        .collection("text")
+        .get();
+
+    List<DocumentSnapshotForAll<Map<String, dynamic>>> docs = snapshot.docs;
+
+    docs.sort((b, a) => a["time"].compareTo(b["time"]));
+
+    return docs[0]["data"];
+  }
+
   static Future<void> setDataToClipboard({required String data}) async {
     Clipboard.setData(
       ClipboardData(
@@ -43,13 +56,5 @@ class ClipboardManager {
     ClipboardData? clipboardData =
         await Clipboard.getData(Clipboard.kTextPlain);
     return clipboardData!.text!;
-  }
-
-  static void listenToClipboardChanges(
-      {required DevicePlatform device, required String deviceName}) async {
-    if (!clipboardWatcher.hasListeners) {
-      clipboardWatcher.addListener(DesktopClipboardListener());
-      clipboardWatcher.start();
-    }
   }
 }
