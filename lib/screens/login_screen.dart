@@ -19,7 +19,7 @@ class LoginScreen extends StatelessWidget {
       password: passwordController.text.trim(),
     );
   }
-  https://newsroom.spotify.com/2021-08-31/how-spotifys-newest-personalized-experience-blend-creates-a-playlist-for-you-and-your-bestie/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
