@@ -117,7 +117,6 @@ String parseWeekday(int index) {
 Widget listViewCard({
   required BuildContext context,
   required String data,
-  required String text,
   required String deviceName,
   required DateTime time,
 }) {
@@ -147,7 +146,6 @@ Widget listViewCard({
                 ),
                 cardDataRow(
                   context: context,
-                  text: text,
                   data: data,
                 ),
                 cardDeviceRow(
@@ -192,24 +190,32 @@ Widget cardTimeRow({
 
 Widget cardDataRow(
     {required BuildContext context,
-    required String text,
     required String data}) {
+  
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Padding(
-        padding: const EdgeInsets.only(
-          left: 15.0,
-        ),
-        child: Text(
-          text,
-          textAlign: TextAlign.left,
-          style: kCardDataTextStyle,
-        ),
+      Expanded(
+        child: Padding(
+            padding: const EdgeInsets.only(
+              left: 15.0,
+            ),
+            child:
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: Text(
+                data, //.substring(0, maxLen),
+                textAlign: TextAlign.left,
+                style: kCardDataTextStyle,
+              ),
+            )
+            ),
       ),
       Padding(
         padding: const EdgeInsets.only(
           right: 5.0,
+          left: 6.0,
         ),
         child: IconButton(
           onPressed: () {

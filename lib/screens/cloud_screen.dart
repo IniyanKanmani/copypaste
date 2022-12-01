@@ -93,18 +93,6 @@ class _CloudScreenState extends State<CloudScreen> {
                   itemBuilder: (context, index) {
                     DocumentSnapshotForAll doc = docs[index];
 
-                    List<String> data = doc["data"].split("");
-                    int dataLength = data.length;
-                    String text;
-
-                    if (dataLength > 28) {
-                      List dataList = data.getRange(0, 28).toList();
-                      dataList.add(" ...");
-                      text = dataList.join("").toString();
-                    } else {
-                      text = doc["data"];
-                    }
-
                     DateTime time;
                     try {
                       time = DateTime.parse(doc["time"].toDate().toString())
@@ -118,7 +106,6 @@ class _CloudScreenState extends State<CloudScreen> {
                     return listViewCard(
                       context: context,
                       data: doc["data"],
-                      text: text,
                       deviceName: deviceName,
                       time: time,
                     );

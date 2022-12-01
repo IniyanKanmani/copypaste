@@ -89,8 +89,6 @@ Future<void> onCreate() async {
       storage: false,
     );
   } catch (e) {
-    print(e);
-    print("Default was already Created");
     await FirebaseCoreForAll.initializeApp(
       name: "Copy Paste",
       options: options,
