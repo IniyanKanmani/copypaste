@@ -43,7 +43,6 @@ dependencies:
   universal_platform: ^1.0.0+1
   animated_bottom_navigation_bar: ^1.1.0
   firebase_core_platform_interface: 4.5.1
-  webview_pro_platform_interface: ^1.8.1+2
 
 dev_dependencies:
   flutter_test:

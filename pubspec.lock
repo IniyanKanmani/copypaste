@@ -616,13 +616,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
-  webview_pro_platform_interface:
-    dependency: "direct main"
-    description:
-      name: webview_pro_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.8.1+2"
   win32:
     dependency: transitive
     description:
