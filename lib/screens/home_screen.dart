@@ -69,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     if (device == DevicePlatform.android) {
       AndroidChannel.requestBackgroundServiceMethod();
+      AndroidChannel.setNewDataAsNotificationMethod(asNotification: false);
     } else if (desktop.contains(device)) {
       desktopClipboardListener.addDesktopClipboardChangesListener();
     }

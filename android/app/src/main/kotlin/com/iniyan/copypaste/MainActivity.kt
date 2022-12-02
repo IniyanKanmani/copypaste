@@ -12,6 +12,7 @@ import java.io.Serializable
 class MainActivity : FlutterActivity() {
     companion object {
         var isAppDestroyed: Boolean = false
+        var askForScreenOverlay: Boolean = false
     }
     private lateinit var backgroundIntent: Intent
 
@@ -25,7 +26,8 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             run {
 
-                if (!Settings.canDrawOverlays(this)) {
+                if (!Settings.canDrawOverlays(this) && !askForScreenOverlay) {
+                    askForScreenOverlay = true
                     val intent = Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse(
                             "package:$packageName"
@@ -39,8 +41,8 @@ class MainActivity : FlutterActivity() {
                     val callArgs: Map<String, String> =
                         call.arguments<Map<String, String>>() as Map<String, String>
 
-                    checkSharedPreferences("userEmail", callArgs["userEmail"] as String)
-                    checkSharedPreferences("deviceName", callArgs["deviceName"] as String)
+                    checkUserCredentialsSharedPreferences("userEmail", callArgs["userEmail"] as String)
+                    checkUserCredentialsSharedPreferences("deviceName", callArgs["deviceName"] as String)
 
                     backgroundIntent =
                         Intent(applicationContext, BackgroundService::class.java)
@@ -70,14 +72,22 @@ class MainActivity : FlutterActivity() {
                     context.sendBroadcast(startBackgroundIntent)
 
                     result.success("Success: Listening for Clipboard and Cloud changes in Foreground.")
+
+                } else if (call.method.equals("setNewDataAsNotification")) {
+
+                    val callArgs: Map<String, Boolean> = call.arguments<Map<String, Boolean>>() as Map<String, Boolean>
+
+                    checkNewDataAsNotificationSharedPreferences("asNotification", callArgs["asNotification"] as Boolean)
+
+                    CloudChanges.asNotification = callArgs["asNotification"] == true
                 }
 
             }
         }
     }
 
-    private fun checkSharedPreferences(key: String, value: String) {
-        val sharedPreferences: SharedPreferences = getSharedPreferences("Android", MODE_PRIVATE)
+    private fun checkUserCredentialsSharedPreferences(key: String, value: String) {
+        val sharedPreferences: SharedPreferences = getSharedPreferences("User", MODE_PRIVATE)
 
         if (sharedPreferences.contains(key)) {
             val data = sharedPreferences.getString(key, "")
@@ -93,6 +103,22 @@ class MainActivity : FlutterActivity() {
             editor.putString(key, value)
             editor.apply()
             return
+        }
+        return
+    }
+
+    private fun checkNewDataAsNotificationSharedPreferences(key: String = "asNotifications", value: Boolean) {
+        val sharedPreferences: SharedPreferences = getSharedPreferences("User", MODE_PRIVATE)
+
+        if (sharedPreferences.contains(key)) {
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+            editor.remove(key)
+            editor.putBoolean(key, value)
+            editor.apply()
+        } else {
+            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+            editor.putBoolean(key, value)
+            editor.apply()
         }
         return
     }

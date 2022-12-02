@@ -21,4 +21,13 @@ class AndroidChannel {
   static void resumeBackgroundServiceMethod() async {
     await platform.invokeMethod("resumeBackgroundService");
   }
+
+  static void setNewDataAsNotificationMethod({asNotification = true}) async {
+    await platform.invokeMethod(
+      "setNewDataAsNotification",
+      {
+        "asNotification": asNotification,
+      },
+    );
+  }
 }

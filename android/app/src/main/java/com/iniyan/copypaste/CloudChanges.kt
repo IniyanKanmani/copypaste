@@ -14,6 +14,7 @@ class CloudChanges {
     companion object {
         private lateinit var collectionReference: CollectionReference
         private lateinit var snapShopListener: ListenerRegistration
+        var asNotification: Boolean = true
         var latestCloudData: String = ""
 
         fun destroy() {
@@ -61,64 +62,70 @@ class CloudChanges {
                                     return
                                 }
 
-
                                 val data: String = docMap["data"] as String
                                 latestCloudData = data
 
-//                                val overlayWindow = OverlayWindow()
-//
-//                                overlayWindow.createOverlayWindow(context)
-//
-//                                val clip = ClipData.newPlainText("text", data)
-//                                BackgroundService.clipboardManager.setPrimaryClip(clip)
-//
-//                                overlayWindow.destroyOverlayWindow()
 
-                                val notificationChannel = NotificationChannel(
-                                    "2",
-                                    "New Data From Cloud Notification",
-                                    NotificationManager.IMPORTANCE_HIGH
-                                )
+                                if (!asNotification) {
 
-                                BackgroundService.copyTextNotificationManager.createNotificationChannel(
-                                    notificationChannel
-                                )
+                                    val overlayWindow = OverlayWindow()
 
-                                val copyIntent =
-                                    Intent(
-                                        context,
-                                        CopyDataToClipboardService::class.java
-                                    )
-                                copyIntent.putExtra("data", data)
-                                copyIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                val copyPendingIntent =
-                                    PendingIntent.getService(
-                                        context,
-                                        0,
-                                        copyIntent,
-                                        PendingIntent.FLAG_MUTABLE
-                                                or PendingIntent.FLAG_UPDATE_CURRENT
-                                                or PendingIntent.FLAG_ONE_SHOT
-                                                or PendingIntent.FLAG_CANCEL_CURRENT
+                                    overlayWindow.createOverlayWindow(context)
+
+                                    val clip = ClipData.newPlainText("text", data)
+                                    BackgroundService.clipboardManager.setPrimaryClip(clip)
+
+                                    overlayWindow.destroyOverlayWindow()
+
+                                } else {
+
+                                    val notificationChannel = NotificationChannel(
+                                        "2",
+                                        "New Data From Cloud Notification",
+                                        NotificationManager.IMPORTANCE_HIGH
                                     )
 
-                                val notification =
-                                    NotificationCompat.Builder(context, "2")
-                                        .setContentTitle("CopyPaste")
-                                        .setContentText(
-                                            "New text from ${
-                                                docMap["device"]
-                                            }"
+                                    BackgroundService.copyTextNotificationManager.createNotificationChannel(
+                                        notificationChannel
+                                    )
+
+                                    val copyIntent =
+                                        Intent(
+                                            context,
+                                            CopyDataToClipboardService::class.java
                                         )
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-                                        .setPriority(NotificationCompat.PRIORITY_MAX)
-                                        .setContentIntent(copyPendingIntent)
-                                        .setAutoCancel(true)
+                                    copyIntent.putExtra("data", data)
+                                    copyIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                    val copyPendingIntent =
+                                        PendingIntent.getService(
+                                            context,
+                                            0,
+                                            copyIntent,
+                                            PendingIntent.FLAG_MUTABLE
+                                                    or PendingIntent.FLAG_UPDATE_CURRENT
+                                                    or PendingIntent.FLAG_ONE_SHOT
+                                                    or PendingIntent.FLAG_CANCEL_CURRENT
+                                        )
 
-                                BackgroundService.copyTextNotificationManager.notify(
-                                    2,
-                                    notification.build()
-                                )
+                                    val notification =
+                                        NotificationCompat.Builder(context, "2")
+                                            .setContentTitle("CopyPaste")
+                                            .setContentText(
+                                                "New text from ${
+                                                    docMap["device"]
+                                                }"
+                                            )
+                                            .setSmallIcon(R.mipmap.ic_launcher)
+                                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                                            .setContentIntent(copyPendingIntent)
+                                            .setAutoCancel(true)
+
+                                    BackgroundService.copyTextNotificationManager.notify(
+                                        2,
+                                        notification.build()
+                                    )
+
+                                }
 
                             }
                         }
