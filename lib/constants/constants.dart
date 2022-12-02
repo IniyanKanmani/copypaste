@@ -205,7 +205,7 @@ Widget cardDataRow(
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
               child: Text(
-                data, //.substring(0, maxLen),
+                data.replaceAll(RegExp('\n'), ' '),
                 textAlign: TextAlign.left,
                 style: kCardDataTextStyle,
               ),
