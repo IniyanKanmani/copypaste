@@ -8,7 +8,7 @@ class AndroidChannel {
     await platform.invokeMethod(
       "backgroundService",
       {
-        "deviceName": deviceName,
+        "deviceName": deviceModel,
         "userEmail": userEmail,
       },
     );

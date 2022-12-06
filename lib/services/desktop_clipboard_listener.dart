@@ -10,7 +10,7 @@ class DesktopClipboardListener extends ClipboardListener {
         ClipboardManager.sendDataToCloud(
           newData: currentClipboardData,
           device: device!,
-          deviceName: deviceName!,
+          deviceName: deviceModel!,
         );
         ClipboardManager.lastDataFromDevice = currentClipboardData;
       }

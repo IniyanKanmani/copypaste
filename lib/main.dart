@@ -21,6 +21,7 @@ String messagingSenderId = "89175436933";
 String projectId = "copypaste-85843";
 
 DevicePlatform? device;
+String? deviceModel;
 String? deviceName;
 String? userEmail;
 String? userToken;
@@ -48,30 +49,31 @@ void main() async {
 
 Future<void> onCreate() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  // print('\nDevice: ${await deviceInfo.deviceInfo}\n\n');
   if (UniversalPlatform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     device = DevicePlatform.android;
-    deviceName = androidInfo.model.toString().trim();
+    deviceModel = androidInfo.model.toString().trim();
   } else if (UniversalPlatform.isIOS) {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     device = DevicePlatform.ios;
-    deviceName = iosInfo.utsname.machine.toString().trim();
+    deviceModel = iosInfo.utsname.machine.toString().trim();
   } else if (UniversalPlatform.isWeb) {
     WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
     device = DevicePlatform.web;
-    deviceName = webBrowserInfo.appCodeName;
+    deviceModel = webBrowserInfo.appCodeName;
   } else if (UniversalPlatform.isLinux) {
     LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
     device = DevicePlatform.linux;
-    deviceName = linuxInfo.name.toString().trim();
+    deviceModel = linuxInfo.name.toString().trim();
   } else if (UniversalPlatform.isWindows) {
     WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
     device = DevicePlatform.windows;
-    deviceName = windowsInfo.computerName.toString().trim();
+    deviceModel = windowsInfo.computerName.toString().trim();
   } else if (UniversalPlatform.isMacOS) {
     MacOsDeviceInfo macOsInfo = await deviceInfo.macOsInfo;
     device = DevicePlatform.macOS;
-    deviceName = macOsInfo.computerName.toString().trim();
+    deviceModel = macOsInfo.computerName.toString().trim();
   }
 
   FirebaseOptions options = FirebaseOptions(
@@ -107,11 +109,60 @@ class MyApp extends StatelessWidget {
         if (snapshot.hasData) {
           userEmail = FirebaseAuthForAll.instance.currentUser!.email;
           FirebaseAuthForAll.instance.currentUser?.getIdToken().then(
-                (value) {
+            (value) {
               userToken = value;
               return value;
             },
           );
+
+          // try {
+          //   QuerySnapshotForAll devices = FirestoreForAll.instance
+          //       .collection('users')
+          //       .doc(userEmail!)
+          //       .collection('devices')
+          //       .get() as QuerySnapshotForAll<Object?>;
+          //
+          //     if (!devices.docs
+          //         .any((element) => element['model'] == deviceModel)) {
+          //       FirestoreForAll.instance
+          //           .collection('users')
+          //           .doc(userEmail!)
+          //           .collection('devices')
+          //           .add({
+          //         'name': deviceModel,
+          //         'model': deviceModel,
+          //         'platform': device.toString().split('.')[1]
+          //       });
+          //     }
+          // } catch (e) {
+          CollectionSnapshots devicesSnapshots = FirestoreForAll.instance
+              .collection('users')
+              .doc(userEmail!)
+              .collection('devices')
+              .snapshots();
+
+          devicesSnapshots.listen((ss) async {
+            print(ss.exists);
+            print(ss.size);
+            // print(ss.docs[0].data());
+            if (!ss.docs.any((element) {
+              Map ele = element.data() as Map<String, dynamic>;
+              return ele['model'] == deviceModel;
+            })) {
+              await FirestoreForAll.instance
+                  .collection('users')
+                  .doc(userEmail!)
+                  .collection('devices')
+                  .add({
+                'name': deviceModel,
+                'model': deviceModel,
+                'platform': device.toString().split('.')[1]
+              });
+            }
+            devicesSnapshots.cancel();
+          });
+          // }
+
           return HomeScreen();
         } else {
           return LoginScreen();

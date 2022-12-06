@@ -57,7 +57,7 @@ class _CloudScreenState extends State<CloudScreen> {
 
               docs.removeWhere(
                 (element) {
-                  if (element["device"] == deviceName) {
+                  if (element["device"] == deviceModel) {
                     return true;
                   }
                   return false;

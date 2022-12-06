@@ -1,3 +1,4 @@
+import 'package:copypaste/main.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
@@ -19,6 +20,22 @@ class LoginScreen extends StatelessWidget {
       password: passwordController.text.trim(),
     );
   }
+
+  // Future loggedIn() async {
+  //   userEmail = FirebaseAuthForAll.instance.currentUser!.email;
+  //   userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
+  //
+  //   ColRef devicesCollection = FirestoreForAll.instance
+  //       .collection('users')
+  //       .doc(userEmail!)
+  //       .collection('devices');
+  //
+  //   await devicesCollection.add({
+  //     'name': deviceName,
+  //     'device': deviceName,
+  //     'platform': device.toString()
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

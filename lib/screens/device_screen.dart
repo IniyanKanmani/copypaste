@@ -53,7 +53,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
               docs.sort((b, a) => a["time"].compareTo(b["time"]));
               docs.removeWhere(
                 (element) {
-                  if (element["device"] == deviceName) {
+                  if (element["device"] == deviceModel) {
                     return false;
                   }
                   return true;
