@@ -36,6 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   intl: ^0.17.0
   http: ^0.13.5
+  provider: ^6.0.4
   cupertino_icons: ^1.0.5
   firebase_for_all: ^0.0.4
   device_info_plus: ^8.0.0

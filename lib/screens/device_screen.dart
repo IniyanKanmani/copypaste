@@ -1,7 +1,9 @@
 import 'package:copypaste/main.dart';
+import 'package:copypaste/services/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
+import 'package:provider/provider.dart';
 
 class DeviceScreen extends StatefulWidget {
   @override
@@ -88,7 +90,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     return listViewCard(
                       context: context,
                       data: doc["data"],
-                      deviceName: deviceName,
+                      cloudDeviceName: deviceName,
                       time: time,
                     );
                   },

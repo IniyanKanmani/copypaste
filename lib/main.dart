@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:copypaste/channels/android_channel.dart';
+import 'package:copypaste/services/app_provider.dart';
 import 'package:copypaste/services/cloud_rest_api.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/screens/home_screen.dart';
 import 'package:copypaste/screens/login_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
@@ -29,6 +32,9 @@ String? deviceModel;
 String? deviceName;
 String? userEmail;
 String? userToken;
+// List<String>? syncDevices;
+
+SharedPreferences? preferences;
 
 List<DevicePlatform> mobile = [
   DevicePlatform.android,
@@ -53,10 +59,16 @@ void main() async {
 
 Future<void> onCreate() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  preferences = await SharedPreferences.getInstance();
   if (UniversalPlatform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     device = DevicePlatform.android;
     deviceModel = androidInfo.model.toString().trim();
+    if (!preferences!.containsKey('asNotification')) {
+      await preferences!.setBool('asNotification', true);
+    } else {
+      AndroidChannel.asNotification = preferences!.getBool('asNotification');
+    }
   } else if (UniversalPlatform.isIOS) {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     device = DevicePlatform.ios;
@@ -105,12 +117,12 @@ Future<void> onCreate() async {
 }
 
 class MyApp extends StatelessWidget {
-  Widget checkSignIn() {
+  Widget checkSignIn(context) {
     return StreamBuilder(
       stream: FirebaseAuthForAll.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          afterSignIn();
+          afterSignIn(context);
           return HomeScreen();
         } else {
           return LoginScreen();
@@ -119,13 +131,19 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future afterSignIn() async {
+  Future afterSignIn(context) async {
     userEmail = FirebaseAuthForAll.instance.currentUser!.email;
     userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
 
-    List<Map<String, String>> allDevices = [];
+    // Provider.of<AppProvider>(context)
+    //     .setUserEmail(FirebaseAuthForAll.instance.currentUser!.email);
+    // Provider.of<AppProvider>(context).setUserToken(
+    //     await FirebaseAuthForAll.instance.currentUser?.getIdToken());
 
-    String unParsedJson = await CloudRestAPI.getCloudDocuments('devices');
+    List<Map<String, String>> allDevices = [];
+    String unParsedJson = await CloudRestAPI.getCloudDocuments(
+      collection: 'devices',
+    );
 
     var parsedJson = json.decode(unParsedJson);
 
@@ -145,11 +163,7 @@ class MyApp extends StatelessWidget {
         String model = doc['fields']['model']['stringValue'];
         String name = doc['fields']['name']['stringValue'];
         String platform = doc['fields']['platform']['stringValue'];
-        docs.add({
-          'model': model,
-          'name': name,
-          'platform': platform
-        });
+        docs.add({'model': model, 'name': name, 'platform': platform});
       }
 
       if (!docs.any((element) => element['model'] == deviceModel)) {
@@ -170,31 +184,40 @@ class MyApp extends StatelessWidget {
         }
       }
 
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-
-      List<String> devices = [];
+      List<String> syncDevices = [];
 
       for (var dev in allDevices) {
-        devices.add(dev['model']!);
+        syncDevices.add(dev['model']!);
       }
 
-      await preferences.setStringList("devices", devices);
+      await preferences!.setStringList("devices", syncDevices);
 
-      for (var dev in devices) {
-        if (!preferences.containsKey(dev)) {
-          await preferences.setBool('sync_$dev', true);
+      Provider.of<AppProvider>(context, listen: false).setSyncDevices(syncDevices);
+
+      for (String dev in syncDevices) {
+        if (!preferences!.containsKey('sync_$dev')) {
+          await preferences!.setBool('sync_$dev', true);
         }
       }
+
+      // if (device == DevicePlatform.android) {
+      //   if (!preferences!.containsKey('asNotification')) {
+      //     await preferences!.setBool('asNotification', true);
+      //   }
+      // }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Copy Paste',
-      debugShowCheckedModeBanner: false,
-      home: SafeArea(
-        child: checkSignIn(),
+    return ChangeNotifierProvider(
+      create: (context) => AppProvider(),
+      child: MaterialApp(
+        title: 'Copy Paste',
+        debugShowCheckedModeBanner: false,
+        home: SafeArea(
+          child: checkSignIn(context),
+        ),
       ),
     );
   }

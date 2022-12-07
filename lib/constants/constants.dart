@@ -117,7 +117,7 @@ String parseWeekday(int index) {
 Widget listViewCard({
   required BuildContext context,
   required String data,
-  required String deviceName,
+  required String cloudDeviceName,
   required DateTime time,
 }) {
   return Padding(
@@ -149,7 +149,7 @@ Widget listViewCard({
                   data: data,
                 ),
                 cardDeviceRow(
-                  deviceName: deviceName,
+                  cloudDeviceName: cloudDeviceName,
                 ),
               ],
             ),
@@ -237,7 +237,7 @@ Widget cardDataRow(
 }
 
 Widget cardDeviceRow({
-  required String deviceName,
+  required String cloudDeviceName,
 }) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.start,
@@ -250,7 +250,7 @@ Widget cardDeviceRow({
           children: [
             kCardDeviceText,
             Text(
-              deviceName,
+              cloudDeviceName,
               style: kCardDeviceNameTextStyle,
             ),
           ],

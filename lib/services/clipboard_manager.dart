@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'package:copypaste/main.dart';
+import 'package:copypaste/services/app_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:copypaste/constants/copied_data.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
+import 'package:provider/provider.dart';
 
 class ClipboardManager {
   static String lastDataFromCloud = "";
   static String lastDataFromDevice = "";
 
   static Future sendDataToCloud({
+    required BuildContext context,
     required String newData,
     required DevicePlatform device,
     required String deviceName,

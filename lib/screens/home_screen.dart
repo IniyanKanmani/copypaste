@@ -16,7 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int currentIndex = 0;
-  DesktopClipboardListener desktopClipboardListener = DesktopClipboardListener();
+  DesktopClipboardListener? desktopClipboardListener;
+  bool asNotifications = true;
 
   List<Widget> screens = [
     CloudScreen(),
@@ -69,17 +70,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     if (device == DevicePlatform.android) {
       AndroidChannel.setEmailAndDeviceMethod();
-      AndroidChannel.setNewDataAsNotificationMethod(asNotification: false);
+      AndroidChannel.setNewDataAsNotificationMethod();
       AndroidChannel.requestBackgroundServiceMethod();
     } else if (desktop.contains(device)) {
-      desktopClipboardListener.addDesktopClipboardChangesListener();
+      desktopClipboardListener = DesktopClipboardListener(context: context);
+      desktopClipboardListener!.addDesktopClipboardChangesListener();
     }
   }
 
   void onDestroy() {
     WidgetsBinding.instance.removeObserver(this);
     if (desktop.contains(device)) {
-      desktopClipboardListener.removeDesktopClipboardChangesListener();
+      desktopClipboardListener!.removeDesktopClipboardChangesListener();
     }
   }
 
