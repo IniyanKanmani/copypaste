@@ -4,30 +4,34 @@ import 'package:flutter/services.dart';
 class AndroidChannel {
   static MethodChannel platform = const MethodChannel("background_service");
 
-  static void requestBackgroundServiceMethod() async {
+  static setEmailAndDeviceMethod() async {
     await platform.invokeMethod(
-      "backgroundService",
+      "setEmailAndDevice",
       {
-        "deviceName": deviceModel,
         "userEmail": userEmail,
+        "deviceName": deviceModel,
       },
     );
   }
 
-  static void pauseBackgroundServiceMethod() async {
-    await platform.invokeMethod("stopBackgroundService");
-  }
-
-  static void resumeBackgroundServiceMethod() async {
-    await platform.invokeMethod("resumeBackgroundService");
-  }
-
-  static void setNewDataAsNotificationMethod({asNotification = true}) async {
+  static setNewDataAsNotificationMethod({asNotification = true}) async {
     await platform.invokeMethod(
       "setNewDataAsNotification",
       {
         "asNotification": asNotification,
       },
     );
+  }
+
+  static requestBackgroundServiceMethod() async {
+    await platform.invokeMethod("backgroundService");
+  }
+
+  static pauseBackgroundServiceMethod() async {
+    await platform.invokeMethod("stopBackgroundService");
+  }
+
+  static resumeBackgroundServiceMethod() async {
+    await platform.invokeMethod("resumeBackgroundService");
   }
 }

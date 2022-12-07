@@ -1,8 +1,12 @@
+import 'dart:convert';
+
+import 'package:copypaste/services/cloud_rest_api.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/screens/home_screen.dart';
 import 'package:copypaste/screens/login_screen.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 
@@ -49,7 +53,6 @@ void main() async {
 
 Future<void> onCreate() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  // print('\nDevice: ${await deviceInfo.deviceInfo}\n\n');
   if (UniversalPlatform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     device = DevicePlatform.android;
@@ -107,68 +110,82 @@ class MyApp extends StatelessWidget {
       stream: FirebaseAuthForAll.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          userEmail = FirebaseAuthForAll.instance.currentUser!.email;
-          FirebaseAuthForAll.instance.currentUser?.getIdToken().then(
-            (value) {
-              userToken = value;
-              return value;
-            },
-          );
-
-          // try {
-          //   QuerySnapshotForAll devices = FirestoreForAll.instance
-          //       .collection('users')
-          //       .doc(userEmail!)
-          //       .collection('devices')
-          //       .get() as QuerySnapshotForAll<Object?>;
-          //
-          //     if (!devices.docs
-          //         .any((element) => element['model'] == deviceModel)) {
-          //       FirestoreForAll.instance
-          //           .collection('users')
-          //           .doc(userEmail!)
-          //           .collection('devices')
-          //           .add({
-          //         'name': deviceModel,
-          //         'model': deviceModel,
-          //         'platform': device.toString().split('.')[1]
-          //       });
-          //     }
-          // } catch (e) {
-          CollectionSnapshots devicesSnapshots = FirestoreForAll.instance
-              .collection('users')
-              .doc(userEmail!)
-              .collection('devices')
-              .snapshots();
-
-          devicesSnapshots.listen((ss) async {
-            print(ss.exists);
-            print(ss.size);
-            // print(ss.docs[0].data());
-            if (!ss.docs.any((element) {
-              Map ele = element.data() as Map<String, dynamic>;
-              return ele['model'] == deviceModel;
-            })) {
-              await FirestoreForAll.instance
-                  .collection('users')
-                  .doc(userEmail!)
-                  .collection('devices')
-                  .add({
-                'name': deviceModel,
-                'model': deviceModel,
-                'platform': device.toString().split('.')[1]
-              });
-            }
-            devicesSnapshots.cancel();
-          });
-          // }
-
+          afterSignIn();
           return HomeScreen();
         } else {
           return LoginScreen();
         }
       },
     );
+  }
+
+  Future afterSignIn() async {
+    userEmail = FirebaseAuthForAll.instance.currentUser!.email;
+    userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
+
+    List<Map<String, String>> allDevices = [];
+
+    String unParsedJson = await CloudRestAPI.getCloudDocuments('devices');
+
+    var parsedJson = json.decode(unParsedJson);
+
+    if (unParsedJson == '{}') {
+      await FirestoreForAll.instance
+          .collection('users')
+          .doc(userEmail!)
+          .collection('devices')
+          .add({
+        'name': deviceModel,
+        'model': deviceModel,
+        'platform': device.toString().split('.')[1]
+      });
+    } else {
+      List docs = [];
+      for (var doc in parsedJson['documents']) {
+        String model = doc['fields']['model']['stringValue'];
+        String name = doc['fields']['name']['stringValue'];
+        String platform = doc['fields']['platform']['stringValue'];
+        docs.add({
+          'model': model,
+          'name': name,
+          'platform': platform
+        });
+      }
+
+      if (!docs.any((element) => element['model'] == deviceModel)) {
+        FirestoreForAll.instance
+            .collection('users')
+            .doc(userEmail!)
+            .collection('devices')
+            .add({
+          'name': deviceModel,
+          'model': deviceModel,
+          'platform': device.toString().split('.')[1]
+        });
+      }
+
+      for (Map dev in docs) {
+        if (dev['model'] != deviceModel) {
+          allDevices.add(dev as Map<String, String>);
+        }
+      }
+
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      List<String> devices = [];
+
+      for (var dev in allDevices) {
+        devices.add(dev['model']!);
+      }
+
+      await preferences.setStringList("devices", devices);
+
+      for (var dev in devices) {
+        if (!preferences.containsKey(dev)) {
+          await preferences.setBool('sync_$dev', true);
+        }
+      }
+    }
   }
 
   @override

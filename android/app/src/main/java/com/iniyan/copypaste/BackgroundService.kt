@@ -34,7 +34,7 @@ class BackgroundService : Service() {
 
         if (receivedMap["killBackground"] == true) {
 
-            CloudChanges.destroy()
+//            CloudChanges.destroy()
 
             stopSelf()
             return START_NOT_STICKY
@@ -99,15 +99,11 @@ class BackgroundService : Service() {
 
             startForeground(1, notification)
 
-        }
-
-        if (receivedMap["inForeground"] == true)
             clipboardChanges()
-
-        cloudChanges()
-
-        if (receivedMap["inForeground"] == true)
+            cloudChanges()
             logChanges()
+
+        }
 
         return START_STICKY
     }
@@ -135,7 +131,7 @@ class BackgroundService : Service() {
 
     private fun cloudChanges() {
 
-        sharedPreferences = getSharedPreferences("Android", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences("User", MODE_PRIVATE)
         userEmail = sharedPreferences.getString("userEmail", "").toString()
         deviceName = sharedPreferences.getString("deviceName", "").toString()
 

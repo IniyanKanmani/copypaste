@@ -13,12 +13,12 @@ import com.google.firebase.firestore.*
 class CloudChanges {
     companion object {
         private lateinit var collectionReference: CollectionReference
-        private lateinit var snapShopListener: ListenerRegistration
+        private lateinit var snapShotListener: ListenerRegistration
         var asNotification: Boolean = true
         var latestCloudData: String = ""
 
         fun destroy() {
-            snapShopListener.remove()
+            snapShotListener.remove()
         }
     }
 
@@ -35,7 +35,7 @@ class CloudChanges {
                 .document(BackgroundService.userEmail)
                 .collection("text")
 
-        snapShopListener =
+        snapShotListener =
             collectionReference
                 .orderBy("time", Query.Direction.DESCENDING)
                 .addSnapshotListener(
