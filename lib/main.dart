@@ -32,7 +32,6 @@ String? deviceModel;
 String? deviceName;
 String? userEmail;
 String? userToken;
-// List<String>? syncDevices;
 
 SharedPreferences? preferences;
 
@@ -135,11 +134,6 @@ class MyApp extends StatelessWidget {
     userEmail = FirebaseAuthForAll.instance.currentUser!.email;
     userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
 
-    // Provider.of<AppProvider>(context)
-    //     .setUserEmail(FirebaseAuthForAll.instance.currentUser!.email);
-    // Provider.of<AppProvider>(context).setUserToken(
-    //     await FirebaseAuthForAll.instance.currentUser?.getIdToken());
-
     List<Map<String, String>> allDevices = [];
     String unParsedJson = await CloudRestAPI.getCloudDocuments(
       collection: 'devices',
@@ -199,12 +193,6 @@ class MyApp extends StatelessWidget {
           await preferences!.setBool('sync_$dev', true);
         }
       }
-
-      // if (device == DevicePlatform.android) {
-      //   if (!preferences!.containsKey('asNotification')) {
-      //     await preferences!.setBool('asNotification', true);
-      //   }
-      // }
     }
   }
 

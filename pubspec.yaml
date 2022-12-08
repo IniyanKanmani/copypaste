@@ -43,6 +43,7 @@ dependencies:
   clipboard_watcher: ^0.1.2
   shared_preferences: ^2.0.15
   universal_platform: ^1.0.0+1
+  flutter_keyboard_visibility: ^5.4.0
   animated_bottom_navigation_bar: ^1.1.0
   firebase_core_platform_interface: 4.5.1
 

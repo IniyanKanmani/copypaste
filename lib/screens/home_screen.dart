@@ -18,12 +18,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int currentIndex = 0;
   DesktopClipboardListener? desktopClipboardListener;
   bool asNotifications = true;
+  CloudScreen cloudScreen = CloudScreen();
+  DeviceScreen deviceScreen = DeviceScreen();
+  SettingsScreen settingsScreen = SettingsScreen();
 
-  List<Widget> screens = [
-    CloudScreen(),
-    DeviceScreen(),
-    SettingsScreen(),
-  ];
+  List<Widget>? screens;
 
   @override
   void initState() {
@@ -59,13 +58,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void onCreate() async {
+    screens = [
+      cloudScreen,
+      deviceScreen,
+      settingsScreen,
+    ];
     WidgetsBinding.instance.addObserver(this);
-
+    if (currentIndex == 0) {
+      cloudScreen.requestRawFocus();
+    }
     try {
       ClipboardManager.lastDataFromDevice =
-      await ClipboardManager.getCurrentClipboardData();
+          await ClipboardManager.getCurrentClipboardData();
       ClipboardManager.lastDataFromCloud =
-      await ClipboardManager.getLastCloudData();
+          await ClipboardManager.getLastCloudData();
     } catch (e) {}
 
     if (device == DevicePlatform.android) {
@@ -91,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       backgroundColor: kBodyBackgroundColor,
       body: IndexedStack(
         index: currentIndex,
-        children: screens,
+        children: screens!,
       ),
       bottomNavigationBar: AnimatedBottomNavigationBar(
         activeIndex: currentIndex,
@@ -105,6 +111,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         notchSmoothness: NotchSmoothness.defaultEdge,
         onTap: (index) {
           currentIndex = index;
+          if (index == 0) {
+            cloudScreen.requestRawFocus();
+          } else if (index == 1) {
+            deviceScreen.requestRawFocus();
+          }
           setState(() {});
         },
         icons: [

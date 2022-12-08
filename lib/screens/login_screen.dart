@@ -3,8 +3,8 @@ import 'package:copypaste/constants/constants.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
 
 class LoginScreen extends StatelessWidget {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   Future signIn() async {
     await FirebaseAuthForAll.instance.signInWithEmailAndPassword(
