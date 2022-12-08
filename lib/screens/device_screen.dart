@@ -83,37 +83,60 @@ class DeviceScreen extends StatelessWidget {
                 child: Scaffold(
                   appBar: AppBar(
                     backgroundColor: kAppBarBackgroundColor,
-                    shape: kAppBarShape,
-                    leading: Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          isTitle = true;
-                          readyToSwitchToTitle = false;
-                          textController.clear();
-                          appProvider.justNotify();
-                          if (eventCount != 0 &&
-                              scrollController.position.hasContentDimensions) {
-                            scrollController.animateTo(
-                              scrollController.position.minScrollExtent,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.decelerate,
-                            );
-                          }
-                        },
-                        child: Icon(
-                          Icons.notes_rounded,
-                          color: kInActiveIconColor,
-                        ),
-                      ),
-                    ),
+                    leadingWidth: isTitle ? 0 : 40.0,
+                    leading: isTitle
+                        ? Container()
+                        : Padding(
+                            padding: const EdgeInsets.only(left: 15.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                isTitle = true;
+                                readyToSwitchToTitle = false;
+                                textController.clear();
+                                appProvider.justNotify();
+                                if (eventCount != 0 &&
+                                    scrollController
+                                        .position.hasContentDimensions) {
+                                  scrollController.animateTo(
+                                    scrollController.position.minScrollExtent,
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.decelerate,
+                                  );
+                                }
+                              },
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back_ios_rounded,
+                                  color: kActiveIconColor,
+                                ),
+                              ),
+                            ),
+                          ),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         if (isTitle)
-                          Text(
-                            "Device Clipboard",
-                            style: TextStyle(
-                              color: kInActiveIconColor,
+                          GestureDetector(
+                            onTap: () {
+                              isTitle = true;
+                              readyToSwitchToTitle = false;
+                              textController.clear();
+                              appProvider.justNotify();
+                              if (eventCount != 0 &&
+                                  scrollController
+                                      .position.hasContentDimensions) {
+                                scrollController.animateTo(
+                                  scrollController.position.minScrollExtent,
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.decelerate,
+                                );
+                              }
+                            },
+                            child: Text(
+                              "Device Clipboard",
+                              style: TextStyle(
+                                color: kActiveIconColor,
+                              ),
                             ),
                           ),
                         if (!isTitle)
@@ -139,7 +162,7 @@ class DeviceScreen extends StatelessWidget {
                                 }
                               },
                               style: TextStyle(
-                                color: kInActiveIconColor,
+                                color: kActiveIconColor,
                               ),
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
@@ -190,7 +213,7 @@ class DeviceScreen extends StatelessWidget {
                             child: Center(
                               child: Icon(
                                 Icons.search_rounded,
-                                color: kInActiveIconColor,
+                                color: kActiveIconColor,
                               ),
                             ),
                           ),
@@ -262,35 +285,40 @@ class DeviceScreen extends StatelessWidget {
                           }
 
                           return Padding(
-                            padding: const EdgeInsets.only(
-                              top: 7.0,
-                            ),
-                            child: ListView.builder(
-                              controller: scrollController,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: eventCount,
-                              itemBuilder: (context, index) {
-                                DocumentSnapshotForAll doc = docsCopy[index];
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 15.0),
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(kClipRRectBorderRadius),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: ListView.builder(
+                                controller: scrollController,
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: eventCount,
+                                itemBuilder: (context, index) {
+                                  DocumentSnapshotForAll doc = docsCopy[index];
 
-                                DateTime time;
-                                try {
-                                  time = DateTime.parse(
-                                          doc["time"].toDate().toString())
-                                      .toLocal();
-                                } catch (e) {
-                                  time = DateTime.parse(doc["time"].toString())
-                                      .toLocal();
-                                }
+                                  DateTime time;
+                                  try {
+                                    time = DateTime.parse(
+                                            doc["time"].toDate().toString())
+                                        .toLocal();
+                                  } catch (e) {
+                                    time =
+                                        DateTime.parse(doc["time"].toString())
+                                            .toLocal();
+                                  }
 
-                                String cloudDeviceName = doc["device"];
+                                  String cloudDeviceName = doc["device"];
 
-                                return listViewCard(
-                                  context: context,
-                                  data: doc["data"],
-                                  cloudDeviceName: cloudDeviceName,
-                                  time: time,
-                                );
-                              },
+                                  return listViewCard(
+                                    context: context,
+                                    data: doc["data"],
+                                    cloudDeviceName: cloudDeviceName,
+                                    time: time,
+                                  );
+                                },
+                              ),
                             ),
                           );
                       }

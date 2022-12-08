@@ -5,24 +5,23 @@ import 'package:copypaste/services/clipboard_manager.dart';
 Color kLoginCursorColorColor = const Color(0xFFC0C0C0);
 Color kLoginTextColorColor = const Color(0xFF999999);
 Color kLoginTextButtonColor = const Color(0xFFDDDDDD);
-Color kAppBarBackgroundColor = const Color(0xFF252525);
-Color kBodyBackgroundColor = const Color(0xFF151515);
-Color kActiveIconColor = const Color(0xFFE270FF);
-Color kInActiveIconColor = const Color(0xFFDAC1FE);
-Color kCardShadowColor = const Color(0xFF505050);
-Color kCardDateTextColor = const Color(0xFFB5179E);
-Color kCardTimeTextColor = const Color(0xFFFC95FC);
-Color kCardDataTextColor = const Color(0xFF130066);
-Color kCardDeviceTextColor = const Color(0xFF6F1AEF);
-Color kCardDeviceNameTextColor = const Color(0xFFD7BDFF);
-Color kCardCopyIconColor = const Color(0xFFC6ADFE);
-Color kCardGradientColor1 = const Color(0xFFE270FF);
-Color kCardGradientColor2 = const Color(0xFFA020F0);
+Color kAppBarBackgroundColor = const Color(0xFF010101);
+Color kBodyBackgroundColor = const Color(0xFF010101);
+Color kActiveIconColor = const Color(0xFFFAFAFA);
+Color kInActiveIconColor = const Color(0xFF989898);
+Color kCardDateTextColor = const Color(0xFF989898);
+Color kCardTimeTextColor = const Color(0xFF989898);
+Color kCardDataTextColor = const Color(0xFFFAFAFA);
+Color kCardDeviceTextColor = const Color(0xFF989898);
+Color kCardDeviceNameTextColor = const Color(0xFFD0D0D0);
+Color kCardCopyIconColor = const Color(0xFF0381FE);
+Color kCardBackgroundColor = const Color(0xFF171717);
 
 double kCardHeight = 100.0;
 double kCardElevation = 20.0;
 double kCardLeftPadding = 7.0;
-double kCardBorderRadius = 13.0;
+double kCardBorderRadius = 15.0;
+double kClipRRectBorderRadius = 15.0;
 double kLoginTextFieldFontSize = 17.0;
 
 TextStyle kCardDateTextStyle = TextStyle(
@@ -65,31 +64,10 @@ Icon kCardCopyButtonIcon = Icon(
   color: kCardCopyIconColor,
 );
 
-ShapeBorder kAppBarShape = const RoundedRectangleBorder(
-  borderRadius: BorderRadius.only(
-    bottomLeft: Radius.circular(
-      15.0,
-    ),
-    bottomRight: Radius.circular(
-      15.0,
-    ),
-  ),
-);
-
-ShapeBorder kCardShape = RoundedRectangleBorder(
+BoxDecoration kCardBoxDecoration = BoxDecoration(
+  color: kCardBackgroundColor,
   borderRadius: BorderRadius.circular(
     kCardBorderRadius,
-  ),
-);
-
-BoxDecoration kCardDecoration = BoxDecoration(
-  gradient: LinearGradient(
-    colors: [
-      kCardGradientColor1,
-      kCardGradientColor2,
-    ],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
   ),
 );
 
@@ -123,37 +101,28 @@ Widget listViewCard({
   return Padding(
     padding: const EdgeInsets.symmetric(
       vertical: 4.0,
-      horizontal: 10.0,
     ),
-    child: SizedBox(
+    child: Container(
       height: kCardHeight,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: kCardShape,
-        elevation: kCardElevation,
-        shadowColor: kCardShadowColor,
-        child: Container(
-          decoration: kCardDecoration,
-          child: Padding(
-            padding: const EdgeInsets.all(
-              5.0,
+      decoration: kCardBoxDecoration,
+      child: Padding(
+        padding: const EdgeInsets.all(
+          5.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            cardTimeRow(
+              time: time,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                cardTimeRow(
-                  time: time,
-                ),
-                cardDataRow(
-                  context: context,
-                  data: data,
-                ),
-                cardDeviceRow(
-                  cloudDeviceName: cloudDeviceName,
-                ),
-              ],
+            cardDataRow(
+              context: context,
+              data: data,
             ),
-          ),
+            cardDeviceRow(
+              cloudDeviceName: cloudDeviceName,
+            ),
+          ],
         ),
       ),
     ),
@@ -188,10 +157,10 @@ Widget cardTimeRow({
   );
 }
 
-Widget cardDataRow(
-    {required BuildContext context,
-    required String data}) {
-  
+Widget cardDataRow({
+  required BuildContext context,
+  required String data,
+}) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -200,8 +169,7 @@ Widget cardDataRow(
             padding: const EdgeInsets.only(
               left: 15.0,
             ),
-            child:
-            SingleChildScrollView(
+            child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
               child: Text(
@@ -209,8 +177,7 @@ Widget cardDataRow(
                 textAlign: TextAlign.left,
                 style: kCardDataTextStyle,
               ),
-            )
-            ),
+            )),
       ),
       Padding(
         padding: const EdgeInsets.only(
@@ -313,11 +280,7 @@ Widget loginElevatedButton({
   return Container(
     width: 140,
     height: 42,
-    decoration: kCardDecoration.copyWith(
-      borderRadius: BorderRadius.circular(
-        kCardBorderRadius,
-      ),
-    ),
+    decoration: kCardBoxDecoration,
     child: ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(

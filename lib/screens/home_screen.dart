@@ -105,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         activeColor: kActiveIconColor,
         inactiveColor: kInActiveIconColor,
         splashSpeedInMilliseconds: 0,
-        leftCornerRadius: 15.0,
-        rightCornerRadius: 15.0,
+        // leftCornerRadius: 15.0,
+        // rightCornerRadius: 15.0,
         gapLocation: GapLocation.none,
         notchSmoothness: NotchSmoothness.defaultEdge,
         onTap: (index) {
