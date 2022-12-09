@@ -9,6 +9,7 @@ Color kAppBarBackgroundColor = const Color(0xFF010101);
 Color kBodyBackgroundColor = const Color(0xFF010101);
 Color kActiveIconColor = const Color(0xFFFAFAFA);
 Color kInActiveIconColor = const Color(0xFF989898);
+Color kCardDividerColor = const Color(0xFF343434);
 Color kCardDateTextColor = const Color(0xFF989898);
 Color kCardTimeTextColor = const Color(0xFF989898);
 Color kCardDataTextColor = const Color(0xFFFAFAFA);
@@ -16,6 +17,8 @@ Color kCardDeviceTextColor = const Color(0xFF989898);
 Color kCardDeviceNameTextColor = const Color(0xFFD0D0D0);
 Color kCardCopyIconColor = const Color(0xFF0381FE);
 Color kCardBackgroundColor = const Color(0xFF171717);
+Color kSwitchActiveColor = const Color(0xFF0381FE);
+Color kSwitchTrackColor = const Color(0xFF666660);
 
 double kCardHeight = 100.0;
 double kCardElevation = 20.0;
@@ -185,6 +188,7 @@ Widget cardDataRow({
           left: 6.0,
         ),
         child: IconButton(
+          splashRadius: 1.0,
           onPressed: () {
             ClipboardManager.setDataToClipboard(data: data);
             ScaffoldMessenger.of(context).showSnackBar(
