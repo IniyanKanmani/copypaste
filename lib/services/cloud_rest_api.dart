@@ -1,10 +1,6 @@
 import 'dart:io';
-
 import 'package:copypaste/main.dart';
-import 'package:copypaste/services/app_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
 class CloudRestAPI {
   static Future<String> getCloudDocuments({

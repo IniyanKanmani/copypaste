@@ -1,8 +1,5 @@
 import 'package:copypaste/main.dart';
-import 'package:copypaste/services/app_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
 class AndroidChannel {
   static MethodChannel platform = const MethodChannel("background_service");

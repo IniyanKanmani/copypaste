@@ -292,6 +292,8 @@ class DeviceScreen extends StatelessWidget {
                                   BorderRadius.circular(kClipRRectBorderRadius),
                               clipBehavior: Clip.antiAliasWithSaveLayer,
                               child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
                                 controller: scrollController,
                                 physics: const BouncingScrollPhysics(),
                                 itemCount: eventCount,

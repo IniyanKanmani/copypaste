@@ -5,19 +5,23 @@ import 'package:flutter/cupertino.dart';
 
 class DesktopClipboardListener extends ClipboardListener {
   BuildContext context;
+
   DesktopClipboardListener({required this.context});
+
   @override
   void onClipboardChanged() async {
-    String currentClipboardData = await ClipboardManager.getCurrentClipboardData();
-      if (currentClipboardData != ClipboardManager.lastDataFromDevice && currentClipboardData != ClipboardManager.lastDataFromCloud) {
-        ClipboardManager.sendDataToCloud(
-          context: context,
-          newData: currentClipboardData,
-          device: device!,
-          deviceName: deviceModel!,
-        );
-        ClipboardManager.lastDataFromDevice = currentClipboardData;
-      }
+    String currentClipboardData =
+        await ClipboardManager.getCurrentClipboardData();
+    if (currentClipboardData != ClipboardManager.lastDataFromDevice &&
+        currentClipboardData != ClipboardManager.lastDataFromCloud) {
+      ClipboardManager.sendDataToCloud(
+        context: context,
+        newData: currentClipboardData,
+        device: device!,
+        deviceName: deviceModel!,
+      );
+      ClipboardManager.lastDataFromDevice = currentClipboardData;
+    }
   }
 
   void addDesktopClipboardChangesListener() {

@@ -63,10 +63,10 @@ Future<void> onCreate() async {
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     device = DevicePlatform.android;
     deviceModel = androidInfo.model.toString().trim();
-    if (!preferences!.containsKey('asNotification')) {
-      await preferences!.setBool('asNotification', true);
+    if (!preferences!.containsKey('as_notification')) {
+      await preferences!.setBool('as_notification', true);
     } else {
-      AndroidChannel.asNotification = preferences!.getBool('asNotification');
+      AndroidChannel.asNotification = preferences!.getBool('as_notification');
     }
   } else if (UniversalPlatform.isIOS) {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
@@ -186,7 +186,8 @@ class MyApp extends StatelessWidget {
 
       await preferences!.setStringList("devices", syncDevices);
 
-      Provider.of<AppProvider>(context, listen: false).setSyncDevices(syncDevices);
+      Provider.of<AppProvider>(context, listen: false)
+          .setSyncDevices(syncDevices);
 
       for (String dev in syncDevices) {
         if (!preferences!.containsKey('sync_$dev')) {
