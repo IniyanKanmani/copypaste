@@ -1,5 +1,5 @@
 import 'package:copypaste/main.dart';
-import 'package:copypaste/services/app_provider.dart';
+import 'package:copypaste/services/copypaste_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
 import 'package:firebase_for_all/firebase_for_all.dart';
@@ -21,10 +21,82 @@ class DeviceScreen extends StatelessWidget {
     rawKeyboardFocusNode.requestFocus();
   }
 
+  Widget deviceScreenListView({required CopyPasteProvider copyPasteProvider}) {
+    List<DocumentSnapshotForAll<Map<String, dynamic>>> docs =
+        copyPasteProvider.getCloudDocs();
+
+    List<DocumentSnapshotForAll<Map<String, dynamic>>> docsCopy =
+        List.from(docs);
+
+    docsCopy.removeWhere(
+      (element) {
+        if (element["device"] == deviceModel) {
+          return false;
+        }
+        return true;
+      },
+    );
+
+    docsCopy = docsCopy.sublist(
+        0, docsCopy.length > maxCopiedData ? maxCopiedData : docsCopy.length);
+
+    if (!isTitle) {
+      docsCopy.retainWhere((element) {
+        if (element["data"]
+            .toString()
+            .toLowerCase()
+            .contains(textController.text.toLowerCase().trim())) {
+          return true;
+        }
+        return false;
+      });
+    }
+
+    eventCount = docsCopy.length;
+
+    if (eventCount == 0) {
+      return Container();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(kClipRRectBorderRadius),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          controller: scrollController,
+          physics: const BouncingScrollPhysics(),
+          itemCount: eventCount,
+          itemBuilder: (context, index) {
+            DocumentSnapshotForAll doc = docsCopy[index];
+
+            DateTime time;
+            try {
+              time = DateTime.parse(doc["time"].toDate().toString()).toLocal();
+            } catch (e) {
+              time = DateTime.parse(doc["time"].toString()).toLocal();
+            }
+
+            String cloudDeviceName = doc["device"];
+
+            return listViewCard(
+              context: context,
+              data: doc["data"],
+              cloudDeviceName: cloudDeviceName,
+              time: time,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppProvider>(
-      builder: (context, appProvider, child) {
+    return Consumer<CopyPasteProvider>(
+      builder: (context, copyPasteProvider, child) {
         return KeyboardVisibilityBuilder(
           builder: (context, isKeyboardVisible) {
             return WillPopScope(
@@ -33,7 +105,7 @@ class DeviceScreen extends StatelessWidget {
                   isTitle = true;
                   readyToSwitchToTitle = false;
                   textController.clear();
-                  appProvider.justNotify();
+                  copyPasteProvider.justNotify();
                   return false;
                 }
                 return true;
@@ -46,7 +118,7 @@ class DeviceScreen extends StatelessWidget {
                       textFieldFocusNode.hasFocus) {
                     isTitle = true;
                     readyToSwitchToTitle = false;
-                    appProvider.justNotify();
+                    copyPasteProvider.justNotify();
                     textFieldFocusNode.unfocus();
                     rawKeyboardFocusNode.requestFocus();
                   } else if (event is RawKeyUpEvent &&
@@ -58,7 +130,7 @@ class DeviceScreen extends StatelessWidget {
                     } else {
                       readyToSwitchToTitle = false;
                     }
-                    appProvider.justNotify();
+                    copyPasteProvider.justNotify();
                     textFieldFocusNode.requestFocus();
                   } else if (event.isKeyPressed(LogicalKeyboardKey.escape) &&
                       textFieldFocusNode.hasFocus) {
@@ -66,7 +138,7 @@ class DeviceScreen extends StatelessWidget {
                       isTitle = true;
                       readyToSwitchToTitle = false;
                       textController.clear();
-                      appProvider.justNotify();
+                      copyPasteProvider.justNotify();
                     }
                     if (eventCount != 0 &&
                         scrollController.position.hasContentDimensions) {
@@ -93,7 +165,7 @@ class DeviceScreen extends StatelessWidget {
                                 isTitle = true;
                                 readyToSwitchToTitle = false;
                                 textController.clear();
-                                appProvider.justNotify();
+                                copyPasteProvider.justNotify();
                                 if (eventCount != 0 &&
                                     scrollController
                                         .position.hasContentDimensions) {
@@ -121,7 +193,7 @@ class DeviceScreen extends StatelessWidget {
                               isTitle = true;
                               readyToSwitchToTitle = false;
                               textController.clear();
-                              appProvider.justNotify();
+                              copyPasteProvider.justNotify();
                               if (eventCount != 0 &&
                                   scrollController
                                       .position.hasContentDimensions) {
@@ -153,7 +225,7 @@ class DeviceScreen extends StatelessWidget {
                                 } else {
                                   readyToSwitchToTitle = false;
                                 }
-                                appProvider.justNotify();
+                                copyPasteProvider.justNotify();
                                 if (eventCount != 0 &&
                                     scrollController
                                         .position.hasContentDimensions) {
@@ -176,7 +248,7 @@ class DeviceScreen extends StatelessWidget {
                               readyToSwitchToTitle = true;
                               textFieldFocusNode.requestFocus();
                               textController.clear();
-                              appProvider.justNotify();
+                              copyPasteProvider.justNotify();
                             } else if (!isTitle && !isKeyboardVisible) {
                               textFieldFocusNode.requestFocus();
                               if (eventCount != 0 &&
@@ -193,7 +265,7 @@ class DeviceScreen extends StatelessWidget {
                                 isTitle = true;
                                 readyToSwitchToTitle = false;
                                 textController.clear();
-                                appProvider.justNotify();
+                                copyPasteProvider.justNotify();
                                 if (eventCount != 0 &&
                                     scrollController
                                         .position.hasContentDimensions) {
@@ -222,110 +294,8 @@ class DeviceScreen extends StatelessWidget {
                     ),
                   ),
                   backgroundColor: kBodyBackgroundColor,
-                  body: CollectionBuilder(
-                    stream: FirestoreForAll.instance
-                        .collection("users")
-                        .doc(userEmail!)
-                        .collection("text")
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshotForAll> snapshot) {
-                      if (snapshot.hasError) {
-                        return Container();
-                      }
-
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        default:
-                          List<DocumentSnapshotForAll<Map<String, dynamic>>>?
-                              docs = snapshot.data?.docs as List<
-                                  DocumentSnapshotForAll<Map<String, dynamic>>>;
-
-                          docs.sort((b, a) => a["time"].compareTo(b["time"]));
-
-                          List<DocumentSnapshotForAll<Map<String, dynamic>>>
-                              docsCopy = List.from(docs);
-
-                          docsCopy.removeWhere(
-                            (element) {
-                              if (element["device"] == deviceModel) {
-                                return false;
-                              }
-                              return true;
-                            },
-                          );
-
-                          docsCopy = docsCopy.sublist(
-                              0,
-                              docsCopy.length > maxCopiedData
-                                  ? maxCopiedData
-                                  : docsCopy.length);
-
-                          if (!isTitle) {
-                            docsCopy.retainWhere((element) {
-                              if (element["data"]
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(textController.text
-                                      .toLowerCase()
-                                      .trim())) {
-                                return true;
-                              }
-                              return false;
-                            });
-                          }
-
-                          eventCount = docsCopy.length;
-
-                          if (eventCount == 0) {
-                            return Container();
-                          }
-
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(kClipRRectBorderRadius),
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                controller: scrollController,
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: eventCount,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshotForAll doc = docsCopy[index];
-
-                                  DateTime time;
-                                  try {
-                                    time = DateTime.parse(
-                                            doc["time"].toDate().toString())
-                                        .toLocal();
-                                  } catch (e) {
-                                    time =
-                                        DateTime.parse(doc["time"].toString())
-                                            .toLocal();
-                                  }
-
-                                  String cloudDeviceName = doc["device"];
-
-                                  return listViewCard(
-                                    context: context,
-                                    data: doc["data"],
-                                    cloudDeviceName: cloudDeviceName,
-                                    time: time,
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                      }
-                    },
-                  ),
+                  body: deviceScreenListView(
+                      copyPasteProvider: copyPasteProvider),
                 ),
               ),
             );

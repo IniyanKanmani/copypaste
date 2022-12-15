@@ -1,5 +1,6 @@
 import 'package:copypaste/main.dart';
 import 'package:copypaste/services/clipboard_manager.dart';
+import 'package:copypaste/services/copypaste_firestore.dart';
 import 'package:copypaste/services/desktop_clipboard_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
@@ -67,6 +68,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (currentIndex == 0) {
       cloudScreen.requestRawFocus();
     }
+
+    CopyPasteFirestore copyPasteFirestore = CopyPasteFirestore();
+    copyPasteFirestore.listenToCloudChanges(context: context);
+
     try {
       ClipboardManager.lastDataFromDevice =
           await ClipboardManager.getCurrentClipboardData();

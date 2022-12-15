@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:copypaste/channels/android_channel.dart';
-import 'package:copypaste/services/app_provider.dart';
+import 'package:copypaste/services/copypaste_provider.dart';
 import 'package:copypaste/services/cloud_rest_api.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/screens/home_screen.dart';
@@ -186,7 +186,7 @@ class MyApp extends StatelessWidget {
 
       await preferences!.setStringList("devices", syncDevices);
 
-      Provider.of<AppProvider>(context, listen: false)
+      Provider.of<CopyPasteProvider>(context, listen: false)
           .setSyncDevices(syncDevices);
 
       for (String dev in syncDevices) {
@@ -200,7 +200,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => AppProvider(),
+      create: (context) => CopyPasteProvider(),
       child: MaterialApp(
         title: 'Copy Paste',
         debugShowCheckedModeBanner: false,

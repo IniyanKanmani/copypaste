@@ -1,6 +1,6 @@
 import 'package:copypaste/channels/android_channel.dart';
 import 'package:copypaste/main.dart';
-import 'package:copypaste/services/app_provider.dart';
+import 'package:copypaste/services/copypaste_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/constants/constants.dart';
@@ -16,14 +16,14 @@ enum SettingsScreens {
 class SettingsScreen extends StatelessWidget {
   SettingsScreens currentScreen = SettingsScreens.main;
 
-  Widget buildSettingsScreen(AppProvider appProvider) {
+  Widget buildSettingsScreen(CopyPasteProvider copyPasteProvider) {
     List<Widget> settingsScreens = [
-      buildMainScreen(appProvider),
-      buildClipboardScreen(appProvider),
+      buildMainScreen(copyPasteProvider),
+      buildClipboardScreen(copyPasteProvider),
       device == DevicePlatform.android
-          ? buildNotificationScreen(appProvider)
+          ? buildNotificationScreen(copyPasteProvider)
           : Container(),
-      buildSyncScreen(appProvider),
+      buildSyncScreen(copyPasteProvider),
     ];
     return Padding(
       padding: const EdgeInsets.only(left: 15.0, top: 4.0, right: 15.0),
@@ -41,7 +41,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildMainScreen(AppProvider appProvider) {
+  Widget buildMainScreen(CopyPasteProvider copyPasteProvider) {
     return Container(
       decoration: kCardBoxDecoration,
       child: Column(
@@ -51,7 +51,7 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               currentScreen = SettingsScreens.clipboard;
-              appProvider.justNotify();
+              copyPasteProvider.justNotify();
             },
             style: TextButton.styleFrom(
               foregroundColor: kSwitchTrackColor,
@@ -94,7 +94,7 @@ class SettingsScreen extends StatelessWidget {
             TextButton(
               onPressed: () {
                 currentScreen = SettingsScreens.notification;
-                appProvider.justNotify();
+                copyPasteProvider.justNotify();
               },
               style: TextButton.styleFrom(
                 foregroundColor: kSwitchTrackColor,
@@ -135,7 +135,7 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               currentScreen = SettingsScreens.sync;
-              appProvider.justNotify();
+              copyPasteProvider.justNotify();
             },
             style: TextButton.styleFrom(
               foregroundColor: kSwitchTrackColor,
@@ -171,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildClipboardScreen(AppProvider appProvider) {
+  Widget buildClipboardScreen(CopyPasteProvider copyPasteProvider) {
     return Container(
       decoration: kCardBoxDecoration,
       child: Column(
@@ -182,7 +182,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildNotificationScreen(AppProvider appProvider) {
+  Widget buildNotificationScreen(CopyPasteProvider copyPasteProvider) {
     return Container(
       decoration: kCardBoxDecoration,
       child: Column(
@@ -191,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -207,7 +207,7 @@ class SettingsScreen extends StatelessWidget {
                     AndroidChannel.asNotification = value;
                     AndroidChannel.setNewDataAsNotificationMethod();
                     await preferences!.setBool('as_notification', value);
-                    appProvider.justNotify();
+                    copyPasteProvider.justNotify();
                   },
                 )
               ],
@@ -218,17 +218,17 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildSyncScreen(AppProvider appProvider) {
+  Widget buildSyncScreen(CopyPasteProvider copyPasteProvider) {
     return Container(
       decoration: kCardBoxDecoration,
       child: ListView.separated(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
-        itemCount: appProvider.getSyncDevices().length,
+        itemCount: copyPasteProvider.getSyncDevices().length,
         separatorBuilder: (BuildContext context, int index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 28.0),
             child: Container(
               width: double.infinity,
               height: 2.0,
@@ -237,10 +237,10 @@ class SettingsScreen extends StatelessWidget {
           );
         },
         itemBuilder: (BuildContext context, int index) {
-          String cloudDeviceName = appProvider.getSyncDevices()[index];
+          String cloudDeviceName = copyPasteProvider.getSyncDevices()[index];
           return Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: 28.0, vertical: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -254,7 +254,7 @@ class SettingsScreen extends StatelessWidget {
                   value: preferences!.getBool('sync_$cloudDeviceName')!,
                   onChanged: (value) async {
                     await preferences!.setBool('sync_$cloudDeviceName', value);
-                    appProvider.justNotify();
+                    copyPasteProvider.justNotify();
                   },
                 )
               ],
@@ -267,13 +267,13 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppProvider>(
-      builder: (context, appProvider, child) {
+    return Consumer<CopyPasteProvider>(
+      builder: (context, copyPasteProvider, child) {
         return WillPopScope(
           onWillPop: () async {
             if (currentScreen != SettingsScreens.main) {
               currentScreen = SettingsScreens.main;
-              appProvider.justNotify();
+              copyPasteProvider.justNotify();
               return false;
             }
             return true;
@@ -289,7 +289,7 @@ class SettingsScreen extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () {
                           currentScreen = SettingsScreens.main;
-                          appProvider.justNotify();
+                          copyPasteProvider.justNotify();
                         },
                         child: Center(
                           child: Icon(
@@ -307,7 +307,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             backgroundColor: kBodyBackgroundColor,
-            body: buildSettingsScreen(appProvider),
+            body: buildSettingsScreen(copyPasteProvider),
           ),
         );
       },
