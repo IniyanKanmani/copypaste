@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:copypaste/channels/android_channel.dart';
+import 'package:copypaste/services/copypaste_firestore.dart';
 import 'package:copypaste/services/copypaste_provider.dart';
 import 'package:copypaste/services/cloud_rest_api.dart';
 import 'package:flutter/material.dart';
@@ -116,13 +118,25 @@ Future<void> onCreate() async {
 }
 
 class MyApp extends StatelessWidget {
+  Stream? loadingScreenStream;
+  StreamController<bool> controller = StreamController();
+
   Widget checkSignIn(context) {
     return StreamBuilder(
       stream: FirebaseAuthForAll.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           afterSignIn(context);
-          return HomeScreen();
+          return StreamBuilder(
+              stream: controller.stream,
+              builder: (context, asyncSnapshot) {
+                if (asyncSnapshot.hasData && asyncSnapshot.data == true) {
+                  return HomeScreen();
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              });
         } else {
           return LoginScreen();
         }
@@ -131,6 +145,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future afterSignIn(context) async {
+    controller.sink.add(false);
     userEmail = FirebaseAuthForAll.instance.currentUser!.email;
     userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
 
@@ -195,6 +210,11 @@ class MyApp extends StatelessWidget {
         }
       }
     }
+
+    CopyPasteFirestore copyPasteFirestore = CopyPasteFirestore();
+    copyPasteFirestore.listenToCloudChanges(context: context);
+
+    controller.sink.add(true);
   }
 
   @override

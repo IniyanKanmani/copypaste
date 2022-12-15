@@ -22,8 +22,14 @@ class DeviceScreen extends StatelessWidget {
   }
 
   Widget deviceScreenListView({required CopyPasteProvider copyPasteProvider}) {
-    List<DocumentSnapshotForAll<Map<String, dynamic>>> docs =
-        copyPasteProvider.getCloudDocs();
+    List<DocumentSnapshotForAll<Map<String, dynamic>>> docs;
+    try {
+      docs = copyPasteProvider.getCloudDocs();
+    } catch (e) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
     List<DocumentSnapshotForAll<Map<String, dynamic>>> docsCopy =
         List.from(docs);

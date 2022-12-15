@@ -69,9 +69,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       cloudScreen.requestRawFocus();
     }
 
-    CopyPasteFirestore copyPasteFirestore = CopyPasteFirestore();
-    copyPasteFirestore.listenToCloudChanges(context: context);
-
     try {
       ClipboardManager.lastDataFromDevice =
           await ClipboardManager.getCurrentClipboardData();
