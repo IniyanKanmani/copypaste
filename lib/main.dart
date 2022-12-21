@@ -119,16 +119,17 @@ Future<void> onCreate() async {
 
 class MyApp extends StatelessWidget {
   Stream? loadingScreenStream;
-  StreamController<bool> controller = StreamController();
+  StreamController<bool>? controller;
 
   Widget checkSignIn(context) {
     return StreamBuilder(
       stream: FirebaseAuthForAll.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          controller = StreamController();
           afterSignIn(context);
           return StreamBuilder(
-              stream: controller.stream,
+              stream: controller!.stream,
               builder: (context, asyncSnapshot) {
                 if (asyncSnapshot.hasData && asyncSnapshot.data == true) {
                   return HomeScreen();
@@ -145,7 +146,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future afterSignIn(context) async {
-    controller.sink.add(false);
+    controller!.sink.add(false);
     userEmail = FirebaseAuthForAll.instance.currentUser!.email;
     userToken = await FirebaseAuthForAll.instance.currentUser?.getIdToken();
 
@@ -212,9 +213,10 @@ class MyApp extends StatelessWidget {
     }
 
     CopyPasteFirestore copyPasteFirestore = CopyPasteFirestore();
-    copyPasteFirestore.listenToCloudChanges(context: context);
+    copyPasteFirestore.listenToCloudChanges(
+        context: context, controller: controller!);
 
-    controller.sink.add(true);
+    controller!.sink.add(true);
   }
 
   @override

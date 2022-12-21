@@ -2,8 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:copypaste/services/clipboard_manager.dart';
 
-Color kLoginCursorColorColor = const Color(0xFFC0C0C0);
-Color kLoginTextColorColor = const Color(0xFF999999);
+Color kLoginCursorColor = const Color(0xFF999999);
+Color kLoginTextColor = const Color(0xFFDDDDDD);
 Color kLoginTextButtonColor = const Color(0xFFDDDDDD);
 Color kAppBarBackgroundColor = const Color(0xFF010101);
 Color kBodyBackgroundColor = const Color(0xFF010101);
@@ -23,8 +23,8 @@ Color kSwitchTrackColor = const Color(0xFF666660);
 double kCardHeight = 100.0;
 double kCardElevation = 20.0;
 double kCardLeftPadding = 7.0;
-double kCardBorderRadius = 15.0;
-double kClipRRectBorderRadius = 15.0;
+double kCardBorderRadius = 20.0;
+double kClipRRectBorderRadius = 20.0;
 double kLoginTextFieldFontSize = 17.0;
 
 TextStyle kCardDateTextStyle = TextStyle(
@@ -244,32 +244,32 @@ Widget loginTextField({
     keyboardType: inputType,
     style: TextStyle(
       fontSize: kLoginTextFieldFontSize,
-      color: kLoginTextColorColor,
+      color: kLoginTextColor,
     ),
     obscureText: obscureText,
-    cursorColor: kLoginCursorColorColor,
+    cursorColor: kLoginCursorColor,
     decoration: InputDecoration(
       filled: true,
-      fillColor: kAppBarBackgroundColor,
+      fillColor: kCardBackgroundColor,
       hintText: hintText,
       hintStyle: TextStyle(
         fontSize: kLoginTextFieldFontSize,
-        color: kLoginTextColorColor,
+        color: kLoginTextColor,
       ),
       focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(
-          color: kLoginTextColorColor,
+          color: kLoginCursorColor,
         ),
         borderRadius: BorderRadius.all(
           Radius.circular(
-            kCardBorderRadius,
+            kCardBorderRadius - 5,
           ),
         ),
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(
-            kCardBorderRadius,
+            kCardBorderRadius - 5,
           ),
         ),
       ),
@@ -292,7 +292,7 @@ Widget loginElevatedButton({
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
-            kCardBorderRadius,
+            kCardBorderRadius - 5,
           ),
         ),
       ),

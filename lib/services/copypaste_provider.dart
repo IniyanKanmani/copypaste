@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class CopyPasteProvider extends ChangeNotifier {
   List<String>? _syncDevices;
-  List<DocumentSnapshotForAll<Map<String, dynamic>>>? _cloudDocs;
+  List<DocumentSnapshotForAll<Map<String, dynamic>>> _cloudDocs = [];
 
   void justNotify() {
     notifyListeners();
@@ -12,7 +12,7 @@ class CopyPasteProvider extends ChangeNotifier {
   List<String> getSyncDevices() => _syncDevices!;
 
   List<DocumentSnapshotForAll<Map<String, dynamic>>> getCloudDocs() =>
-      _cloudDocs!;
+      _cloudDocs;
 
   void setSyncDevices(syncDevices) {
     _syncDevices = syncDevices;

@@ -25,13 +25,7 @@ class CloudScreen extends StatelessWidget {
 
   Widget cloudScreenListView({required CopyPasteProvider copyPasteProvider}) {
     List<DocumentSnapshotForAll<Map<String, dynamic>>> docs;
-    try {
-      docs = copyPasteProvider.getCloudDocs();
-    } catch (e) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+    docs = copyPasteProvider.getCloudDocs();
 
     List<DocumentSnapshotForAll<Map<String, dynamic>>> docsCopy =
         List.from(docs);
